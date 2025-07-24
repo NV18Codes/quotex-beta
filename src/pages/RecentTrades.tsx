@@ -38,14 +38,15 @@ const RecentTrades = () => {
   const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
 
   // Ensure trades are available
-  useEffect(() => {
-    // If no trades in localStorage, initialize them
-    const savedTrades = localStorage.getItem('userTrades');
-    if (!savedTrades) {
-      // This will trigger the getUnifiedTradeData function to generate trades
-      getUnifiedTradeData();
-    }
-  }, []);
+  // Remove this useEffect, as it can cause mock trades to be generated
+  // useEffect(() => {
+  //   // If no trades in localStorage, initialize them
+  //   const savedTrades = localStorage.getItem('userTrades');
+  //   if (!savedTrades) {
+  //     // This will trigger the getUnifiedTradeData function to generate trades
+  //     getUnifiedTradeData();
+  //   }
+  // }, []);
 
   useEffect(() => {
     const handleUpdate = () => {

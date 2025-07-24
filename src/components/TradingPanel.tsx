@@ -76,21 +76,16 @@ const TradingPanel = () => {
           timestamp: new Date(trade.timestamp),
           timeLeft: trade.timeLeft !== undefined ? trade.timeLeft : 0,
           result: trade.result === 'win' ? 'win' : trade.result === 'loss' ? 'loss' : undefined,
-        }));
+        })) as Trade[];
         setActiveTrades(parsedTrades);
       } catch (error) {
         console.error('Error parsing saved trades:', error);
-        // If parsing fails, initialize with default trades
-        const defaultTrades = user?.tradeHistory || [];
-        setActiveTrades(defaultTrades);
-        localStorage.setItem('userTrades', JSON.stringify(defaultTrades));
+        setActiveTrades([]); // If parsing fails, set to empty
+        localStorage.setItem('userTrades', JSON.stringify([]));
       }
     } else {
-      // If no saved trades, initialize with the default trade history from AuthContext
-      const defaultTrades = user?.tradeHistory || [];
-      setActiveTrades(defaultTrades);
-      // Save the default trades to localStorage
-      localStorage.setItem('userTrades', JSON.stringify(defaultTrades));
+      setActiveTrades([]); // No fallback to user?.tradeHistory or mock data
+      localStorage.setItem('userTrades', JSON.stringify([]));
     }
   }, [user]);
 

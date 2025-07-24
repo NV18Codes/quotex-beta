@@ -27,16 +27,17 @@ import { getUnifiedTradeData } from '@/contexts/AuthContext';
 const TradingDashboard = () => {
   const { user } = useAuth();
   const [liveBalance, setLiveBalance] = useState(user?.liveBalance || 0);
+  // Only use user's actual trade history
   const { trades: unifiedTrades, stats: unifiedStats } = getUnifiedTradeData(user?.tradeHistory);
 
-  // Ensure trade data is available
-  useEffect(() => {
-    const savedTrades = localStorage.getItem('userTrades');
-    if (!savedTrades) {
-      // This will trigger the getUnifiedTradeData function to generate trades
-      getUnifiedTradeData();
-    }
-  }, []);
+  // Remove fallback that triggers getUnifiedTradeData() with no arguments
+  // useEffect(() => {
+  //   const savedTrades = localStorage.getItem('userTrades');
+  //   if (!savedTrades) {
+  //     // This will trigger the getUnifiedTradeData function to generate trades
+  //     getUnifiedTradeData();
+  //   }
+  // }, []);
 
   // Generate mock market data
   const markets = [

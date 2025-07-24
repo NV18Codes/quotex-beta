@@ -41,56 +41,24 @@ export const useAuth = () => {
   return context;
 };
 
-// Generate extensive trade history for the past 2-3 days
-const generateTradeHistory = (): Trade[] => {
-  const trades: Trade[] = [];
-  const symbols = ['EUR/USD', 'GBP/USD', 'USD/JPY', 'AUD/USD', 'USD/CAD', 'EUR/GBP', 'USD/CHF', 'NZD/USD'];
-  const now = new Date();
-
-  for (let i = 0; i < 11893; i++) {
-    const daysAgo = Math.random() * 3;
-    const hoursAgo = Math.random() * 24;
-    const minutesAgo = Math.random() * 60;
-
-    const timestamp = new Date(now.getTime() - (daysAgo * 24 * 60 * 60 * 1000) - (hoursAgo * 60 * 60 * 1000) - (minutesAgo * 60 * 1000));
-
-    const amount = Math.floor(Math.random() * 1000) + 10;
-    const isWin = Math.random() < 0.95;
-    const profit = isWin ? amount * (0.7 + Math.random() * 0.6) : -amount * (0.8 + Math.random() * 0.4);
-    const duration = [30, 60, 120, 300, 600][Math.floor(Math.random() * 5)];
-
-    trades.push({
-      id: `trade_${i}`,
-      symbol: symbols[Math.floor(Math.random() * symbols.length)],
-      type: Math.random() > 0.5 ? 'buy' : 'sell',
-      amount,
-      result: isWin ? 'win' : 'loss',
-      profit,
-      timestamp,
-      duration
-    });
-  }
-
-  return trades.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-};
-
 // Two default users
-const samuelUser: User = {
-  id: '1',
-  name: 'Samuel Joseph',
-  email: 'samuelkjoseph2020@gmail.com',
-  demoBalance: 111111.45,
-  liveBalance: 145897,
-  totalTrades: 11893,
-  winRate: 95,
-  totalPnL: 349000,
-  tradeHistory: generateTradeHistory()
-};
+// Remove Samuel user definition
+// const samuelUser: User = {
+//   id: '1',
+//   name: 'Samuel Joseph',
+//   email: 'samuelkjoseph2020@gmail.com',
+//   demoBalance: 111111.45,
+//   liveBalance: 145897,
+//   totalTrades: 11893,
+//   winRate: 95,
+//   totalPnL: 349000,
+//   tradeHistory: generateTradeHistory()
+// };
 
 const jonathanUser: User = {
   id: '2',
   name: 'Jonathan George Jeremiah',
-  email: 'jonathanjeremiah@example.com',
+  email: 'johathan23j@gmail.com', // Updated to match login credentials
   demoBalance: 10000,
   liveBalance: 21000,
   totalTrades: 0,
@@ -113,20 +81,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const existingTrades = localStorage.getItem('userTrades');
     if (!existingTrades) {
-      const defaultTrades = generateTradeHistory().map(trade => ({
-        ...trade,
-        status: 'completed'
-      }));
-      localStorage.setItem('userTrades', JSON.stringify(defaultTrades));
+      // No default trades for Jonathan (0 trades)
+      localStorage.setItem('userTrades', JSON.stringify([]));
     }
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     let authenticatedUser: User | null = null;
 
-    if (email === 'samuelkjoseph2020@gmail.com' && password === 'Samuel2025!') {
-      authenticatedUser = samuelUser;
-    } else if (email === 'johathan23j@gmail.com' && password === 'godfather23JGJJJ$!') {
+    if (email === 'johathan23j@gmail.com' && password === 'godfather23JGJJJ$!') {
       authenticatedUser = jonathanUser;
     }
 
@@ -135,14 +98,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(authenticatedUser);
       setIsAuthenticated(true);
 
-      const existingTrades = localStorage.getItem('userTrades');
-      if (!existingTrades && authenticatedUser.tradeHistory.length > 0) {
-        const defaultTrades = authenticatedUser.tradeHistory.map(trade => ({
-          ...trade,
-          status: 'completed'
-        }));
-        localStorage.setItem('userTrades', JSON.stringify(defaultTrades));
-      }
+      // Always reset userTrades to an empty array for a fresh start
+      localStorage.setItem('userTrades', JSON.stringify([]));
 
       return true;
     }
@@ -206,49 +163,14 @@ export function getUnifiedTradeData(userTradeHistory?: any[]): {
       console.error('Error parsing saved trades:', error);
       baseTrades = [];
     }
-  }
-
-  if (baseTrades.length === 0 && userTradeHistory) {
+  } else if (userTradeHistory && userTradeHistory.length > 0) {
     baseTrades = userTradeHistory.map(trade => ({
       ...trade,
       status: 'completed'
     }));
   }
 
-  if (baseTrades.length === 0) {
-    const defaultTrades = generateTradeHistory().map(trade => ({
-      ...trade,
-      status: 'completed'
-    }));
-    baseTrades = defaultTrades;
-    localStorage.setItem('userTrades', JSON.stringify(defaultTrades));
-  }
-
-  if (baseTrades.length < 11893) {
-    const additionalTrades = [];
-    const currentCount = baseTrades.length;
-    const neededCount = 11893 - currentCount;
-    const winCount = Math.floor(neededCount * 0.95);
-
-    for (let i = 0; i < neededCount; i++) {
-      const isWin = i < winCount;
-      const profit = isWin ? 30 + Math.random() * 50 : -30 - Math.random() * 30;
-      additionalTrades.push({
-        id: `additional_${currentCount + i}`,
-        symbol: i % 4 === 0 ? 'EUR/USD' : i % 4 === 1 ? 'BTC/USD' : i % 4 === 2 ? 'GBP/USD' : 'XAU/USD',
-        type: i % 2 === 0 ? 'buy' : 'sell',
-        amount: 100 + Math.floor(Math.random() * 400),
-        duration: 60,
-        result: isWin ? 'win' : 'loss',
-        profit,
-        timestamp: new Date(Date.now() - ((currentCount + i) * 60000)),
-        status: 'completed'
-      });
-    }
-    baseTrades = [...additionalTrades, ...baseTrades];
-    localStorage.setItem('userTrades', JSON.stringify(baseTrades));
-  }
-
+  // Only use actual trades; if none, return empty stats
   const completedTrades = baseTrades.filter(trade => trade.status === 'completed');
   const totalTrades = completedTrades.length;
   const winningTrades = completedTrades.filter(trade => trade.result === 'win').length;

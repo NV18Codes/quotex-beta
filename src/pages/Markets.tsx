@@ -150,11 +150,8 @@ const Markets = () => {
       }));
       setActiveTrades(parsedTrades);
     } else {
-      // If no saved trades, initialize with the default trade history from AuthContext
-      const defaultTrades = user?.tradeHistory || [];
-      setActiveTrades(defaultTrades);
-      // Save the default trades to localStorage
-      localStorage.setItem('userTrades', JSON.stringify(defaultTrades));
+      setActiveTrades([]); // No fallback to user?.tradeHistory or mock data
+      localStorage.setItem('userTrades', JSON.stringify([]));
     }
   }, [user]);
 
