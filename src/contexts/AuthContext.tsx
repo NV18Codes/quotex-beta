@@ -98,8 +98,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(authenticatedUser);
       setIsAuthenticated(true);
 
-      // Always reset userTrades to an empty array for a fresh start
-      localStorage.setItem('userTrades', JSON.stringify([]));
+      // Only set userTrades to an empty array if it does not exist (first login)
+      if (!localStorage.getItem('userTrades')) {
+        localStorage.setItem('userTrades', JSON.stringify([]));
+      }
 
       return true;
     }
