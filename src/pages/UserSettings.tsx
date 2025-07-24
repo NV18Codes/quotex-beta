@@ -152,11 +152,11 @@ const UserSettings = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <Label htmlFor="firstName" className="text-gray-300">First Name</Label>
-                      <Input id="firstName" defaultValue="Samuel" className="mt-1 bg-gray-700 border-gray-600 text-white" />
+                      <Input id="firstName" defaultValue="Jonathan" className="mt-1 bg-gray-700 border-gray-600 text-white" />
                     </div>
                     <div>
                       <Label htmlFor="lastName" className="text-gray-300">Last Name</Label>
-                      <Input id="lastName" defaultValue="Joseph" className="mt-1 bg-gray-700 border-gray-600 text-white" />
+                      <Input id="lastName" defaultValue="George Jeremiah" className="mt-1 bg-gray-700 border-gray-600 text-white" />
                     </div>
                     <div>
                       <Label htmlFor="email" className="text-gray-300">Email Address</Label>
@@ -197,6 +197,7 @@ const UserSettings = () => {
                   <Button
                     onClick={handleSaveSettings}
                     className="bg-blue-600 text-white hover:bg-blue-700"
+                    // Ensure button is always active
                   >
                     <Save className="h-4 w-4 mr-2" />
                     Save Changes

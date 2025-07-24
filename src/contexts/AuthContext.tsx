@@ -29,6 +29,7 @@ interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
   updateBalance: (amount: number) => void;
+  setUserFromLocalStorage: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -67,6 +68,13 @@ const jonathanUser: User = {
   tradeHistory: []
 };
 
+// Helper to recalculate liveBalance from trade history
+function recalculateLiveBalance(user: User, trades: any[]): number {
+  const initialBalance = jonathanUser.liveBalance;
+  const totalProfit = trades.reduce((sum, trade) => sum + (trade.profit || 0), 0);
+  return initialBalance + totalProfit;
+}
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -81,20 +89,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const existingTrades = localStorage.getItem('userTrades');
     if (!existingTrades) {
-      // No default trades for Jonathan (0 trades)
       localStorage.setItem('userTrades', JSON.stringify([]));
     }
   }, []);
+
+  // Persist user to localStorage whenever it changes
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('qxTrader_user', JSON.stringify(user));
+    }
+  }, [user]);
+
+  // Update liveBalance automatically when trades change
+  useEffect(() => {
+    if (user) {
+      const savedTrades = localStorage.getItem('userTrades');
+      let trades = [];
+      if (savedTrades) {
+        try {
+          trades = JSON.parse(savedTrades);
+        } catch {
+          trades = [];
+        }
+      }
+      const newBalance = recalculateLiveBalance(user, trades);
+      if (user.liveBalance !== newBalance) {
+        setUser({ ...user, liveBalance: newBalance });
+      }
+    }
+  }, [user?.id, user?.email, user?.name]);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     let authenticatedUser: User | null = null;
 
     if (email === 'johathan23j@gmail.com' && password === 'godfather23JGJJJ$!') {
-      authenticatedUser = jonathanUser;
+      // Check if user already exists in localStorage
+      const savedUser = localStorage.getItem('qxTrader_user');
+      if (savedUser) {
+        authenticatedUser = JSON.parse(savedUser);
+      } else {
+        authenticatedUser = jonathanUser;
+        // Only set localStorage if new user
+        localStorage.setItem('qxTrader_user', JSON.stringify(authenticatedUser));
+      }
     }
 
     if (authenticatedUser) {
-      localStorage.setItem('qxTrader_user', JSON.stringify(authenticatedUser));
       setUser(authenticatedUser);
       setIsAuthenticated(true);
 
@@ -126,12 +166,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Add setUserFromLocalStorage
+  const setUserFromLocalStorage = () => {
+    const savedUser = localStorage.getItem('qxTrader_user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  };
+
   const value = {
     user,
     login,
     logout,
     isAuthenticated,
-    updateBalance
+    updateBalance,
+    setUserFromLocalStorage
   };
 
   return (
