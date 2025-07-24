@@ -168,7 +168,7 @@ const UserSettings = () => {
                     </div>
                     <div>
                       <Label htmlFor="country" className="text-gray-300">Country</Label>
-                      <Select defaultValue="us">
+                      <Select defaultValue="uae">
                         <SelectTrigger className="mt-1 bg-gray-700 border-gray-600 text-white">
                           <SelectValue />
                         </SelectTrigger>
@@ -177,12 +177,13 @@ const UserSettings = () => {
                           <SelectItem value="uk" className="text-white hover:bg-gray-600">United Kingdom</SelectItem>
                           <SelectItem value="ca" className="text-white hover:bg-gray-600">Canada</SelectItem>
                           <SelectItem value="au" className="text-white hover:bg-gray-600">Australia</SelectItem>
+                          <SelectItem value="uae" className="text-white hover:bg-gray-600">United Arab Emirates</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
                       <Label htmlFor="timezone" className="text-gray-300">Timezone</Label>
-                      <Select defaultValue="est">
+                      <Select defaultValue="gst">
                         <SelectTrigger className="mt-1 bg-gray-700 border-gray-600 text-white">
                           <SelectValue />
                         </SelectTrigger>
@@ -190,6 +191,7 @@ const UserSettings = () => {
                           <SelectItem value="est" className="text-white hover:bg-gray-600">Eastern Time (EST)</SelectItem>
                           <SelectItem value="pst" className="text-white hover:bg-gray-600">Pacific Time (PST)</SelectItem>
                           <SelectItem value="gmt" className="text-white hover:bg-gray-600">Greenwich Mean Time (GMT)</SelectItem>
+                          <SelectItem value="gst" className="text-white hover:bg-gray-600">Gulf Standard Time (GST)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

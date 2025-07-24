@@ -80,8 +80,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
+    localStorage.clear();
     const savedUser = localStorage.getItem('qxTrader_user');
-    if (savedUser) {
+    if (!savedUser) {
+      // Initialize demo-ready user
+      localStorage.setItem('qxTrader_user', JSON.stringify(jonathanUser));
+      setUser(jonathanUser);
+      setIsAuthenticated(false);
+    } else {
       const userData = JSON.parse(savedUser);
       setUser(userData);
       setIsAuthenticated(true);
