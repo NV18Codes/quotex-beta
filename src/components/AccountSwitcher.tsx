@@ -60,7 +60,7 @@ const AccountSwitcher = () => {
                 <div className="font-medium">Live Account</div>
                 <div className="text-sm opacity-80">
                   {isLiveBalanceVisible 
-                    ? `Balance: ${formatCurrency(11045)}`
+                    ? `Balance: ${formatCurrency(35000)}`
                     : 'Available at 11:45 PM EST/PST'
                   }
                 </div>
