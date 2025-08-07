@@ -61,7 +61,7 @@ const jonathanUser: User = {
   name: 'Jonathan George Jeremiah',
   email: 'johathan23j@gmail.com', // Updated to match login credentials
   demoBalance: 10000,
-  liveBalance: 35000,
+  liveBalance: 55000,
   totalTrades: 0,
   winRate: 0,
   totalPnL: 0,
