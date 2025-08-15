@@ -10,6 +10,20 @@ interface User {
   winRate: number;
   totalPnL: number;
   tradeHistory: Trade[];
+  // Dubai Region verification fields
+  dubaiVerification?: {
+    isVerified: boolean;
+    verificationDate?: Date;
+    fullName?: string;
+    country?: string;
+    address?: string;
+    whyQuotex?: string;
+    governmentId?: string;
+    documentsUploaded?: boolean;
+    verificationStatus: 'pending' | 'approved' | 'rejected';
+    submittedAt?: Date;
+  };
+  accountType?: 'demo' | 'live';
 }
 
 interface Trade {
@@ -30,6 +44,9 @@ interface AuthContextType {
   isAuthenticated: boolean;
   updateBalance: (amount: number) => void;
   setUserFromLocalStorage: () => void;
+  // Dubai verification methods
+  submitDubaiVerification: (verificationData: any) => void;
+  checkDubaiVerificationRequired: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -65,7 +82,13 @@ const jonathanUser: User = {
   totalTrades: 0,
   winRate: 0,
   totalPnL: 0,
-  tradeHistory: []
+  tradeHistory: [],
+  accountType: 'live',
+  dubaiVerification: {
+    isVerified: false,
+    verificationStatus: 'pending',
+    documentsUploaded: false
+  }
 };
 
 // Helper to recalculate liveBalance from trade history
@@ -180,13 +203,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Dubai verification methods
+  const submitDubaiVerification = (verificationData: any) => {
+    if (user) {
+      const updatedUser = {
+        ...user,
+        dubaiVerification: {
+          ...user.dubaiVerification,
+          ...verificationData,
+          submittedAt: new Date(),
+          verificationStatus: 'pending' as const,
+          documentsUploaded: true
+        }
+      };
+      setUser(updatedUser);
+      localStorage.setItem('qxTrader_user', JSON.stringify(updatedUser));
+    }
+  };
+
+  const checkDubaiVerificationRequired = (): boolean => {
+    if (!user) return false;
+    
+    // Check if user is in Dubai region (you can add more sophisticated logic here)
+    const isDubaiRegion = true; // For now, assume all users are in Dubai region
+    
+    // Check if verification is already completed
+    const isAlreadyVerified = user.dubaiVerification?.isVerified;
+    
+    // Manual verification - no automatic balance threshold
+    // Users can manually trigger verification when needed
+    return isDubaiRegion && !isAlreadyVerified;
+  };
+
   const value = {
     user,
     login,
     logout,
     isAuthenticated,
     updateBalance,
-    setUserFromLocalStorage
+    setUserFromLocalStorage,
+    submitDubaiVerification,
+    checkDubaiVerificationRequired
   };
 
   return (

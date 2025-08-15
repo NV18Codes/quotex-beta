@@ -18,8 +18,11 @@ import {
   CheckCircle, 
   XCircle,
   AlertCircle,
-  Filter
+  Filter,
+  Shield
 } from 'lucide-react';
+import DubaiVerificationModal from './DubaiVerificationModal';
+import { useToast } from '@/hooks/use-toast';
 
 interface Trade {
   id: string;
@@ -35,13 +38,23 @@ interface Trade {
 }
 
 const TradingPanel = () => {
-  const { user, updateBalance } = useAuth();
+  const { user, updateBalance, checkDubaiVerificationRequired } = useAuth();
+  const { toast } = useToast();
   const [activeTrades, setActiveTrades] = useState<Trade[]>([]);
   const [selectedSymbol, setSelectedSymbol] = useState('EUR/USD');
   const [tradeAmount, setTradeAmount] = useState(100);
   const [tradeDuration, setTradeDuration] = useState(60);
   const [isTrading, setIsTrading] = useState(false);
   const [tradeFilter, setTradeFilter] = useState<'all' | 'buy' | 'sell' | 'pending' | 'completed'>('all');
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+
+  // Check if Dubai verification is required
+  const isVerificationRequired = useMemo(() => {
+    return checkDubaiVerificationRequired();
+  }, [checkDubaiVerificationRequired]);
+
+  // Show manual verification option instead of automatic warnings
+  const showManualVerification = isVerificationRequired && user?.liveBalance > 50000;
 
   const symbols = [
     { value: 'EUR/USD', label: 'EUR/USD', name: 'Euro / US Dollar' },
@@ -453,6 +466,30 @@ const TradingPanel = () => {
             </Select>
           </div>
 
+          {/* Dubai Verification Warning */}
+          {showManualVerification && (
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <Shield className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                <div className="space-y-2">
+                  <h4 className="font-medium text-blue-500">Enhanced Security Verification Available</h4>
+                  <p className="text-sm text-blue-400">
+                    Your account balance exceeds $50,000 USD. For enhanced security and compliance, 
+                    you can complete Dubai region identity verification. This is optional but recommended.
+                  </p>
+                  <Button
+                    onClick={() => setShowVerificationModal(true)}
+                    variant="outline"
+                    size="sm"
+                    className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
+                  >
+                    Complete Verification
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Trade Buttons */}
           <div className="grid grid-cols-2 gap-3">
             <Button
@@ -591,6 +628,12 @@ const TradingPanel = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Dubai Verification Modal */}
+      <DubaiVerificationModal
+        isOpen={showVerificationModal}
+        onClose={() => setShowVerificationModal(false)}
+      />
     </div>
   );
 };

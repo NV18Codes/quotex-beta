@@ -21,7 +21,7 @@ const TradingInterface = ({
   formatPrice, 
   formatCurrency 
 }: TradingInterfaceProps) => {
-  const { user, currentBalance, isAuthenticated } = useAuth();
+  const { user, currentBalance, isAuthenticated, checkDubaiVerificationRequired } = useAuth();
   const [expiryTime, setExpiryTime] = useState('15:00');
 
   const potentialProfit = Math.floor(investment * 0.98);
@@ -33,6 +33,11 @@ const TradingInterface = ({
     if (user?.accountType === 'live' && currentBalance > 0) return true;
     return false;
   };
+
+  const isVerificationRequired = checkDubaiVerificationRequired();
+
+  // Show manual verification option for high balance users
+  const showManualVerification = isVerificationRequired && user?.liveBalance > 50000;
 
   const handleInvestmentChange = (value: string) => {
     const numValue = Number(value);
@@ -132,6 +137,19 @@ const TradingInterface = ({
           <Clock className="h-4 w-4" />
           <span>Expires in: {expiryTime}</span>
         </div>
+
+        {/* Dubai Verification Warning */}
+        {showManualVerification && (
+          <div className="bg-blue-500/10 border border-blue-500/20 text-blue-500 text-sm p-3 rounded-md flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4" />
+            <div>
+              <div className="font-medium">Enhanced Security Verification Available</div>
+              <div className="text-xs text-blue-400 mt-1">
+                Your account balance exceeds $50,000 USD. Complete verification for enhanced security.
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Warning Messages */}
         {!canTrade() && (
