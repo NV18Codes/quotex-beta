@@ -78,7 +78,7 @@ const jonathanUser: User = {
   name: 'Jonathan George Jeremiah',
   email: 'johathan23j@gmail.com', // Updated to match login credentials
   demoBalance: 10000,
-  liveBalance: 55000,
+  liveBalance: 60000,
   totalTrades: 0,
   winRate: 0,
   totalPnL: 0,
@@ -103,7 +103,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    localStorage.clear();
     const savedUser = localStorage.getItem('qxTrader_user');
     if (!savedUser) {
       // Initialize demo-ready user

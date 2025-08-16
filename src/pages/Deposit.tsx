@@ -21,7 +21,7 @@ const Deposit = () => {
 
   const [depositData, setDepositData] = useState({
     amount: '100',
-    paymentMethod: 'Credit Card',
+    paymentMethod: 'Bank Transfer',
     firstName: 'JOSHUA',
     lastName: 'KENNETH JOSEPH',
     email: 'joshua.kenneth@example.com',
@@ -84,7 +84,7 @@ const Deposit = () => {
       // Reset form
       setDepositData({
         amount: '100',
-        paymentMethod: 'Credit Card',
+        paymentMethod: 'Bank Transfer',
         firstName: 'JOSHUA',
         lastName: 'KENNETH JOSEPH',
         email: 'joshua.kenneth@example.com',
@@ -228,12 +228,6 @@ const Deposit = () => {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-gray-700 border-gray-600">
-                          <SelectItem value="Credit Card" className="text-white hover:bg-gray-600">
-                            <div className="flex items-center gap-2">
-                              <CreditCard className="h-4 w-4" />
-                              Credit Card
-                            </div>
-                          </SelectItem>
                           <SelectItem value="Bank Transfer" className="text-white hover:bg-gray-600">
                             <div className="flex items-center gap-2">
                               <Banknote className="h-4 w-4" />
@@ -328,12 +322,7 @@ const Deposit = () => {
                 <CardTitle className="text-white">Payment Method Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-gray-700 rounded-lg">
-                    <CreditCard className="h-8 w-8 text-blue-400 mx-auto mb-2" />
-                    <h4 className="font-medium text-white mb-1">Credit Card</h4>
-                    <p className="text-sm text-gray-400">Instant processing</p>
-                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="text-center p-4 bg-gray-700 rounded-lg">
                     <Banknote className="h-8 w-8 text-green-400 mx-auto mb-2" />
                     <h4 className="font-medium text-white mb-1">Bank Transfer</h4>
@@ -358,7 +347,7 @@ const Deposit = () => {
           <CardContent className="space-y-4">
             <div className="border-l-4 border-blue-500 pl-4">
               <h4 className="font-medium text-white mb-2">How long does deposit processing take?</h4>
-              <p className="text-gray-400">Credit card deposits are instant, while bank transfers take 1-3 business days.</p>
+              <p className="text-gray-400">Bank transfers take 1-3 business days to process and reflect in your account.</p>
             </div>
             <div className="border-l-4 border-green-500 pl-4">
               <h4 className="font-medium text-white mb-2">What are the deposit limits?</h4>

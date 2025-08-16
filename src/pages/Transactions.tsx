@@ -97,7 +97,7 @@ const Transactions = () => {
       timestamp: new Date(deposit.timestamp)
     }));
 
-    // Sample deposit transactions to show $55k balance
+    // Sample deposit transactions to show $60k balance
     const sampleDeposits: Transaction[] = [
       {
         id: 'deposit_sample_1',
@@ -105,7 +105,7 @@ const Transactions = () => {
         date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB'), // 30 days ago
         status: 'succeeded',
         type: 'deposit',
-        paymentSystem: 'Credit Card',
+        paymentSystem: 'Bank Transfer',
         amount: 14000.00,
         timestamp: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
       },
@@ -125,7 +125,7 @@ const Transactions = () => {
         date: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB'), // 20 days ago
         status: 'succeeded',
         type: 'deposit',
-        paymentSystem: 'Credit Card',
+        paymentSystem: 'Bank Transfer',
         amount: 14000.00,
         timestamp: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000)
       },
@@ -138,6 +138,16 @@ const Transactions = () => {
         paymentSystem: 'Bank Transfer',
         amount: 20000.00,
         timestamp: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000)
+      },
+      {
+        id: 'deposit_sample_5',
+        order: 'D50000000',
+        date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB'), // 10 days ago
+        status: 'succeeded',
+        type: 'deposit',
+        paymentSystem: 'Bank Transfer',
+        amount: 5000.00,
+        timestamp: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)
       }
     ];
 
