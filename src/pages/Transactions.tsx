@@ -97,7 +97,7 @@ const Transactions = () => {
       timestamp: new Date(deposit.timestamp)
     }));
 
-    // Sample deposit transactions to show $60k balance
+    // Sample deposit transactions to show $60k balance + new $8k deposit
     const sampleDeposits: Transaction[] = [
       {
         id: 'deposit_sample_1',
@@ -148,6 +148,16 @@ const Transactions = () => {
         paymentSystem: 'Bank Transfer',
         amount: 5000.00,
         timestamp: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)
+      },
+      {
+        id: 'deposit_sample_6',
+        order: 'D80000000',
+        date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB'), // 2 days ago
+        status: 'succeeded',
+        type: 'deposit',
+        paymentSystem: 'Bank Transfer',
+        amount: 8000.00,
+        timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
       }
     ];
 
