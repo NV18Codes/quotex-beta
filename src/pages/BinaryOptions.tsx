@@ -21,11 +21,13 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import AuthModal from '@/components/AuthModal';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const BinaryOptions = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
   // Debug: Monitor authentication state
   useEffect(() => {
@@ -43,6 +45,10 @@ const BinaryOptions = () => {
       console.log('User is not authenticated, showing auth modal...');
       setIsAuthModalOpen(true);
     }
+  };
+
+  const handleDownloadPlatform = () => {
+    setIsDownloadModalOpen(true);
   };
 
   const features = [
@@ -134,7 +140,12 @@ const BinaryOptions = () => {
                 <User className="h-4 w-4 mr-2" />
                 {isAuthenticated ? 'Go to Dashboard' : 'Start Trading'}
               </Button>
-              <Button variant="outline" size="lg" className="bg-gray-700 text-white border-gray-600 hover:bg-white hover:text-gray-700 transition-colors duration-200">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="bg-gray-700 text-white border-gray-600 hover:bg-white hover:text-gray-700 transition-colors duration-200"
+                onClick={handleDownloadPlatform}
+              >
                 <Download className="h-4 w-4 mr-2" />
                 Download Platform
               </Button>
@@ -271,6 +282,45 @@ const BinaryOptions = () => {
 
       <Footer />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      
+             {/* Download Platform Modal */}
+       <Dialog open={isDownloadModalOpen} onOpenChange={setIsDownloadModalOpen}>
+         <DialogContent className="sm:max-w-lg bg-white border-0 shadow-2xl rounded-2xl">
+           <DialogHeader className="pb-4">
+             <DialogTitle className="text-center text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+               🚀 Coming Soon!
+             </DialogTitle>
+           </DialogHeader>
+           <div className="text-center px-2">
+             <div className="mb-8">
+               <div className="w-24 h-24 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                 <Download className="h-12 w-12 text-white" />
+               </div>
+               <h3 className="text-2xl font-bold text-gray-800 mb-4">
+                 Mobile Trading Platform
+               </h3>
+                               <p className="text-gray-600 leading-relaxed text-lg max-w-md mx-auto">
+                  Our powerful mobile trading platform is currently in development and will be available soon.
+                </p>
+             </div>
+             
+             
+             
+             <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-6 mb-8 shadow-sm">
+               <p className="text-base text-blue-800 font-medium">
+                 <span className="text-lg">✨</span> Stay tuned! We'll notify you as soon as the mobile platform is ready for download.
+               </p>
+             </div>
+             
+             <Button 
+               onClick={() => setIsDownloadModalOpen(false)}
+               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+             >
+               Got it! 👍
+             </Button>
+           </div>
+         </DialogContent>
+       </Dialog>
     </div>
   );
 };
