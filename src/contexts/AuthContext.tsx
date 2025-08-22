@@ -91,12 +91,7 @@ const jonathanUser: User = {
   }
 };
 
-// Helper to recalculate liveBalance from trade history
-function recalculateLiveBalance(user: User, trades: any[]): number {
-  const initialBalance = jonathanUser.liveBalance;
-  const totalProfit = trades.reduce((sum, trade) => sum + (trade.profit || 0), 0);
-  return initialBalance + totalProfit;
-}
+
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -111,6 +106,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsAuthenticated(false);
     } else {
       const userData = JSON.parse(savedUser);
+      // Ensure live balance is always $80,000
+      userData.liveBalance = 80000;
       setUser(userData);
       setIsAuthenticated(true);
     }
@@ -128,22 +125,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
-  // Update liveBalance automatically when trades change
+  // Ensure live balance stays fixed at $80,000
   useEffect(() => {
-    if (user) {
-      const savedTrades = localStorage.getItem('userTrades');
-      let trades = [];
-      if (savedTrades) {
-        try {
-          trades = JSON.parse(savedTrades);
-        } catch {
-          trades = [];
-        }
-      }
-      const newBalance = recalculateLiveBalance(user, trades);
-      if (user.liveBalance !== newBalance) {
-        setUser({ ...user, liveBalance: newBalance });
-      }
+    if (user && user.liveBalance !== 80000) {
+      setUser({ ...user, liveBalance: 80000 });
     }
   }, [user?.id, user?.email, user?.name]);
 
@@ -155,6 +140,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const savedUser = localStorage.getItem('qxTrader_user');
       if (savedUser) {
         authenticatedUser = JSON.parse(savedUser);
+        // Ensure live balance is always $80,000 regardless of saved state
+        authenticatedUser.liveBalance = 80000;
       } else {
         authenticatedUser = jonathanUser;
         // Only set localStorage if new user
@@ -185,9 +172,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateBalance = (amount: number) => {
     if (user) {
+      // For deposits, only update demo balance, keep live balance fixed at $80,000
       const updatedUser = {
         ...user,
-        liveBalance: user.liveBalance + amount
+        demoBalance: user.demoBalance + amount,
+        liveBalance: 80000 // Always keep live balance fixed
       };
       setUser(updatedUser);
       localStorage.setItem('qxTrader_user', JSON.stringify(updatedUser));

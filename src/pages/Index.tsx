@@ -26,7 +26,8 @@ import { getUnifiedTradeData } from '@/contexts/AuthContext';
 
 const TradingDashboard = () => {
   const { user } = useAuth();
-  const [liveBalance, setLiveBalance] = useState(user?.liveBalance || 0);
+  // Use fixed live balance from user context, no local state fluctuations
+  const liveBalance = user?.liveBalance || 80000;
   // Only use user's actual trade history
   const { trades: unifiedTrades, stats: unifiedStats } = getUnifiedTradeData(user?.tradeHistory);
 
@@ -47,16 +48,7 @@ const TradingDashboard = () => {
     { symbol: 'XAU/USD', currentPrice: 2045, changePercent: 0.59, volume: 850000 }
   ];
 
-  // Real-time balance updates
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setLiveBalance(prev => {
-        const fluctuation = (Math.random() - 0.5) * 100; // Small random fluctuation
-        return Math.max(0, prev + fluctuation);
-      });
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+  // Live balance is now fixed at $80,000 - no random fluctuations
 
   // Listen for the 'trades-updated' event
   useEffect(() => {
@@ -116,7 +108,7 @@ const TradingDashboard = () => {
     {
       title: 'Live Balance',
       value: `$${liveBalance.toLocaleString()}`,
-      change: 'Live updates',
+      change: 'Fixed at $80,000',
       isPositive: true,
       icon: Activity
     }
