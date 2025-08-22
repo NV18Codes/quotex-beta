@@ -22,9 +22,9 @@ const Deposit = () => {
   const [depositData, setDepositData] = useState({
     amount: '100',
     paymentMethod: 'Bank Transfer',
-    firstName: 'JOSHUA',
+    firstName: 'JONATHAN',
     lastName: 'KENNETH JOSEPH',
-    email: 'joshua.kenneth@example.com',
+    email: 'jonathan.kenneth@example.com',
             phone: '+971 50 848 0638'
   });
 
@@ -85,9 +85,9 @@ const Deposit = () => {
       setDepositData({
         amount: '100',
         paymentMethod: 'Bank Transfer',
-        firstName: 'JOSHUA',
+        firstName: 'JONATHAN',
         lastName: 'KENNETH JOSEPH',
-        email: 'joshua.kenneth@example.com',
+        email: 'jonathan.kenneth@example.com',
         phone: '+971 50 848 0638'
       });
 
