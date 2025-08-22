@@ -161,12 +161,41 @@ const Transactions = () => {
       }
     ];
 
+    // Generate sample trade transactions to ensure 150 trades
+    const generateSampleTrades = (): Transaction[] => {
+      const sampleTrades: Transaction[] = [];
+      const symbols = ['EUR/USD', 'GBP/USD', 'BTC/USD', 'XAU/USD', 'AAPL', 'GOOGL', 'TSLA', 'MSFT'];
+      const tradeTypes = ['buy', 'sell'];
+      
+      for (let i = 0; i < 150; i++) {
+        const isWin = Math.random() > 0.4; // 60% win rate
+        const amount = Math.floor(Math.random() * 500) + 50; // $50 to $550
+        const profit = isWin ? amount * (0.8 + Math.random() * 0.4) : -amount; // 80-120% profit on wins, full loss on losses
+        
+        sampleTrades.push({
+          id: `trade_sample_${i + 1}`,
+          order: `T${(i + 1).toString().padStart(8, '0')}`,
+          date: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB'), // Random date within 90 days
+          status: 'succeeded',
+          type: 'trade',
+          paymentSystem: `${symbols[Math.floor(Math.random() * symbols.length)]} ${tradeTypes[Math.floor(Math.random() * tradeTypes.length)].toUpperCase()}`,
+          amount: profit,
+          timestamp: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000)
+        });
+      }
+      
+      return sampleTrades.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    };
+
+    const sampleTrades = generateSampleTrades();
+
     // Combine all transactions and sort by timestamp
     const allTransactions = [
       ...tradeTransactions,
       ...withdrawalTransactions,
       ...depositTransactions,
-      ...sampleDeposits
+      ...sampleDeposits,
+      ...sampleTrades
     ].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
     setTransactions(allTransactions);
