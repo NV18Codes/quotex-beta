@@ -46,7 +46,7 @@ const Contact = () => {
       title: 'Email Support',
       description: 'Get help via email',
       contact: 'support@tradeplatform.com',
-      response: 'Within 24 hours'
+              response: 'Within 7 business days'
     },
     {
       icon: Phone,
@@ -148,7 +148,7 @@ const Contact = () => {
                       <CheckCircle className="h-6 w-6 text-green-600" />
                       <div>
                         <h3 className="font-semibold text-green-900">Message Sent!</h3>
-                        <p className="text-green-700">We'll get back to you within 24 hours.</p>
+                        <p className="text-green-700">We'll get back to you within 7 business days.</p>
                       </div>
                     </div>
                   </CardContent>

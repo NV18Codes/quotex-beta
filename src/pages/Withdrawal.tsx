@@ -77,7 +77,7 @@ const Withdrawal = () => {
           <Alert className="mb-6 border-green-600 bg-green-900/20">
             <CheckCircle className="h-4 w-4 text-green-600" />
             <AlertDescription className="text-green-300">
-              <strong>Verification Status: Completed</strong> - Expect a call within the next 24 hours from our verification team. 
+                             <strong>Verification Status: Completed</strong> - Expect a call within the next 7 business days from our verification team. 
               Withdrawal requests will be enabled after the verification call is completed.
             </AlertDescription>
           </Alert>
@@ -144,7 +144,7 @@ const Withdrawal = () => {
                          <div className="text-blue-300">
                            <div className="font-medium">Status: Awaiting Verification Call</div>
                            <div className="text-sm text-blue-400 mt-1">
-                             Expect a call within the next 24 hours from our verification team
+                                                           Expect a call within the next 7 business days from our verification team
                            </div>
                          </div>
                        </div>
