@@ -21,7 +21,7 @@ const TradingInterface = ({
   formatPrice, 
   formatCurrency 
 }: TradingInterfaceProps) => {
-  const { user, currentBalance, isAuthenticated, checkDubaiVerificationRequired } = useAuth();
+  const { user, currentBalance, isAuthenticated } = useAuth();
   const [expiryTime, setExpiryTime] = useState('15:00');
 
   const potentialProfit = Math.floor(investment * 0.98);
@@ -33,11 +33,6 @@ const TradingInterface = ({
     if (user?.accountType === 'live' && currentBalance > 0) return true;
     return false;
   };
-
-  const isVerificationRequired = checkDubaiVerificationRequired();
-
-  // Show manual verification option for high balance users
-  const showManualVerification = isVerificationRequired && user?.liveBalance > 50000;
 
   const handleInvestmentChange = (value: string) => {
     const numValue = Number(value);
