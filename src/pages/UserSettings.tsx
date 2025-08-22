@@ -168,7 +168,7 @@ const UserSettings = () => {
                     </div>
                     <div>
                       <Label htmlFor="phone" className="text-gray-300">Phone Number</Label>
-                      <Input id="phone" defaultValue="+1 (555) 123-4567" className="mt-1 bg-gray-700 border-gray-600 text-white" />
+                      <Input id="phone" defaultValue="+971 50 848 0638" className="mt-1 bg-gray-700 border-gray-600 text-white" />
                     </div>
                     <div>
                       <Label htmlFor="country" className="text-gray-300">Country</Label>
@@ -253,44 +253,25 @@ const UserSettings = () => {
                       </div>
                     </div>
                     
-                    {/* Dubai Verification Section */}
-                    <Separator className="bg-gray-700" />
-                    <div>
-                      <Label className="text-gray-300 mb-3 block">Dubai Region Verification</Label>
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-4">
-                          <Button
-                            onClick={() => setShowVerificationModal(true)}
-                            className="bg-blue-600 hover:bg-blue-700"
-                            size="sm"
-                          >
-                            <Shield className="h-4 w-4 mr-2" />
-                            Verify Account
-                          </Button>
-                          <div className="text-sm text-gray-400">
-                            {user?.liveBalance > 50000 
-                              ? 'High balance detected. Verification recommended for enhanced security and compliance.'
-                              : 'Complete verification for enhanced account security and compliance.'
-                            }
-                          </div>
-                        </div>
-                        
-                        {/* Processing Time Info */}
-                        <div className="bg-blue-900/20 border border-blue-800/30 rounded-lg p-4">
-                          <div className="flex items-start gap-3">
-                            <Clock className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
-                            <div>
-                              <h4 className="font-medium text-blue-300 mb-2">Verification Processing</h4>
-                              <div className="text-sm text-blue-400 space-y-1">
-                                <p>• Standard processing time: <strong>48 hours</strong></p>
-                                <p>• You'll receive email notification upon completion</p>
-                                <p>• Trading continues normally during verification</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                                         {/* Dubai Verification Section */}
+                     <Separator className="bg-gray-700" />
+                     <div>
+                       <Label className="text-gray-300 mb-3 block">Dubai Region Verification</Label>
+                       <div className="space-y-4">
+                         {/* Verification Completion Message */}
+                         <div className="bg-green-900/20 border border-green-800/30 rounded-lg p-4">
+                           <div className="flex items-start gap-3">
+                             <CheckCircle className="h-5 w-5 text-green-400 mt-0.5 flex-shrink-0" />
+                             <div>
+                               <h4 className="font-medium text-green-300 mb-2">Account Verification Completed</h4>
+                               <div className="text-sm text-green-400">
+                                 <p>Expect a call within the next 24 hours from our verification team.</p>
+                               </div>
+                             </div>
+                           </div>
+                         </div>
+                       </div>
+                     </div>
                     <Separator className="bg-gray-700" />
                     <div className="flex gap-4">
                       <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700">

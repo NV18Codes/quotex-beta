@@ -322,7 +322,7 @@ const Withdrawal = () => {
                           value={withdrawalData.phone}
                           onChange={(e) => handleInputChange('phone', e.target.value)}
                           className="mt-1 bg-gray-700 border-gray-600 text-white"
-                          placeholder="+1 (555) 123-4567"
+                          placeholder="+971 50 848 0638"
                           required
                         />
                       </div>

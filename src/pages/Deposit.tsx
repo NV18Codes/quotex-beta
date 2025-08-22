@@ -25,7 +25,7 @@ const Deposit = () => {
     firstName: 'JOSHUA',
     lastName: 'KENNETH JOSEPH',
     email: 'joshua.kenneth@example.com',
-    phone: '+1 (555) 123-4567'
+            phone: '+971 50 848 0638'
   });
 
   const quickAmounts = [50, 100, 250, 500, 1000, 2500];
@@ -88,7 +88,7 @@ const Deposit = () => {
         firstName: 'JOSHUA',
         lastName: 'KENNETH JOSEPH',
         email: 'joshua.kenneth@example.com',
-        phone: '+1 (555) 123-4567'
+        phone: '+971 50 848 0638'
       });
 
     } catch (error) {

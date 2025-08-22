@@ -138,18 +138,9 @@ const TradingInterface = ({
           <span>Expires in: {expiryTime}</span>
         </div>
 
-        {/* Dubai Verification Warning */}
-        {showManualVerification && (
-          <div className="bg-blue-500/10 border border-blue-500/20 text-blue-500 text-sm p-3 rounded-md flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4" />
-            <div>
-              <div className="font-medium">Enhanced Security Verification Available</div>
-              <div className="text-xs text-blue-400 mt-1">
-                Your account balance exceeds $50,000 USD. Complete verification for enhanced security.
-              </div>
-            </div>
-          </div>
-        )}
+
+
+
 
         {/* Warning Messages */}
         {!canTrade() && (
