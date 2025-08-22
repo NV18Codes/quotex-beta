@@ -17,11 +17,33 @@ import {
   Download,
   User
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import AuthModal from '@/components/AuthModal';
 
 const BinaryOptions = () => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  // Debug: Monitor authentication state
+  useEffect(() => {
+    console.log('BinaryOptions: Authentication state changed:', isAuthenticated);
+  }, [isAuthenticated]);
+
+  const handleStartTrading = () => {
+    console.log('Start Trading clicked, isAuthenticated:', isAuthenticated);
+    if (isAuthenticated) {
+      // If user is logged in, redirect to dashboard (root path)
+      console.log('User is authenticated, redirecting to dashboard...');
+      navigate('/');
+    } else {
+      // If user is not logged in, show auth modal
+      console.log('User is not authenticated, showing auth modal...');
+      setIsAuthModalOpen(true);
+    }
+  };
 
   const features = [
     {
@@ -106,11 +128,11 @@ const BinaryOptions = () => {
             </p>
             <div className="flex justify-center gap-4">
               <Button 
-                onClick={() => setIsAuthModalOpen(true)}
+                onClick={handleStartTrading}
                 className="bg-gray-700 text-white hover:bg-white hover:text-gray-700 px-8 py-3 text-lg font-semibold"
               >
                 <User className="h-4 w-4 mr-2" />
-                Start Trading
+                {isAuthenticated ? 'Go to Dashboard' : 'Start Trading'}
               </Button>
               <Button variant="outline" size="lg" className="bg-gray-700 text-white border-gray-600 hover:bg-white hover:text-gray-700 transition-colors duration-200">
                 <Download className="h-4 w-4 mr-2" />
@@ -224,19 +246,21 @@ const BinaryOptions = () => {
       <section className="py-16 bg-blue-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to Start Trading?
+            {isAuthenticated ? 'Ready to Trade?' : 'Ready to Start Trading?'}
           </h2>
           <p className="text-blue-100 mb-8 max-w-2xl mx-auto leading-relaxed">
-            Join thousands of traders who are already earning profits with binary options. 
-            Start with a demo account to practice risk-free.
+            {isAuthenticated 
+              ? 'Access your dashboard and start trading with your live account. Monitor your positions and track your profits.'
+              : 'Join thousands of traders who are already earning profits with binary options. Start with a demo account to practice risk-free.'
+            }
           </p>
           <div className="flex justify-center gap-4">
             <Button 
               size="lg" 
               className="bg-white text-blue-600 hover:bg-gray-100 transition-colors duration-200"
-              onClick={() => setIsAuthModalOpen(true)}
+              onClick={handleStartTrading}
             >
-              Open Demo Account
+              {isAuthenticated ? 'Go to Dashboard' : 'Open Demo Account'}
             </Button>
             <Button size="lg" variant="outline" className="border-white text-white hover:bg-blue-700 transition-colors duration-200">
               Learn More
