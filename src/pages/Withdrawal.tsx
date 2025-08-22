@@ -6,32 +6,20 @@ import Footer from '@/components/Footer';
 import DubaiVerificationModal from '@/components/DubaiVerificationModal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { Shield, AlertTriangle, CheckCircle, TrendingDown, DollarSign, Clock, FileText, MapPin, User, Phone, Banknote, CreditCard, ChevronRight } from 'lucide-react';
+import { Shield, AlertTriangle, CheckCircle, TrendingDown, DollarSign, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const Withdrawal = () => {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [showVerificationModal, setShowVerificationModal] = useState(false);
 
-  const [withdrawalData, setWithdrawalData] = useState({
-    amount: '10',
-    paymentMethod: 'Net Banking',
-    firstName: 'JOSHUA',
-    lastName: 'KENNETH JOSEPH',
-    address: '#13/5 1st cross,anjenappa block, Bangalore- 560046.',
-    phone: '',
-    ifscCode: 'abcd0999999',
-    accountNumber: ''
-  });
+
 
   // Check if user is verified - For now, show as completed
   const isVerified = true; // Set to true to show completion message
@@ -44,89 +32,7 @@ const Withdrawal = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Check verification status
-    if (!isVerified) {
-      setShowVerificationModal(true);
-      return;
-    }
 
-    const amount = parseFloat(withdrawalData.amount);
-    
-    if (isNaN(amount) || amount <= 0) {
-      toast({
-        title: "Invalid Amount",
-        description: "Please enter a valid withdrawal amount.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (amount > (user?.liveBalance || 0)) {
-      toast({
-        title: "Insufficient Balance",
-        description: "Your withdrawal amount exceeds your available balance.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Save withdrawal request to localStorage
-      const withdrawalRequest = {
-        id: `withdrawal_${Date.now()}`,
-        ...withdrawalData,
-        amount: amount,
-        status: 'pending',
-        timestamp: new Date().toISOString(),
-        userId: user?.id
-      };
-
-      const existingWithdrawals = JSON.parse(localStorage.getItem('userWithdrawals') || '[]');
-      existingWithdrawals.push(withdrawalRequest);
-      localStorage.setItem('userWithdrawals', JSON.stringify(existingWithdrawals));
-
-      toast({
-        title: "Withdrawal Request Submitted",
-        description: "Your withdrawal request has been submitted successfully. You will receive confirmation within 24-48 hours.",
-      });
-
-      // Reset form
-      setWithdrawalData({
-        amount: '10',
-        paymentMethod: 'Net Banking',
-        firstName: 'JOSHUA',
-        lastName: 'KENNETH JOSEPH',
-        address: '#13/5 1st cross,anjenappa block, Bangalore- 560046.',
-        phone: '',
-        ifscCode: 'abcd0999999',
-        accountNumber: ''
-      });
-
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to submit withdrawal request. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleInputChange = (field: string, value: string) => {
-    setWithdrawalData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
 
   // If not authenticated, show loading
   if (!isAuthenticated || !user) {
@@ -214,183 +120,56 @@ const Withdrawal = () => {
             </Card>
           </div>
 
-          {/* Withdrawal Form */}
-          <div className="lg:col-span-2">
-            <Card className="bg-gray-800 border-gray-700">
-                             <CardHeader>
+                     {/* Withdrawal Status */}
+           <div className="lg:col-span-2">
+             <Card className="bg-gray-800 border-gray-700">
+               <CardHeader>
                  <CardTitle className="flex items-center gap-2 text-white">
                    <TrendingDown className="h-5 w-5" />
-                   Withdrawal Request
+                   Withdrawal Status
                  </CardTitle>
-                 {isVerified && (
-                   <div className="mt-2">
-                     <Alert className="border-blue-600 bg-blue-900/20">
-                       <Clock className="h-4 w-4 text-blue-600" />
-                       <AlertDescription className="text-blue-300">
-                         <strong>Withdrawal Status: Pending</strong> - Withdrawal requests are temporarily disabled until the verification call is completed. 
-                         You can view and prepare your withdrawal details below.
-                       </AlertDescription>
-                     </Alert>
-                   </div>
-                 )}
                </CardHeader>
-              <CardContent>
-                
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                       <div>
-                         <Label htmlFor="amount" className="text-gray-300">Withdrawal Amount (USD)</Label>
-                         <Input
-                           id="amount"
-                           type="number"
-                           value={withdrawalData.amount}
-                           onChange={(e) => handleInputChange('amount', e.target.value)}
-                           className="mt-1 bg-gray-700 border-gray-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                           placeholder="Enter amount"
-                           min="10"
-                           max={user.liveBalance}
-                           required
-                           disabled={isVerified}
-                         />
-                         <div className="text-xs text-gray-400 mt-1">
-                           Min: $10 | Max: ${user.liveBalance.toLocaleString()}
+               <CardContent>
+                 {isVerified ? (
+                   <div className="text-center py-12">
+                     <Clock className="h-16 w-16 text-blue-500 mx-auto mb-4" />
+                     <h3 className="text-xl font-semibold text-white mb-2">Withdrawal Temporarily Disabled</h3>
+                     <p className="text-gray-400 mb-6">
+                       Withdrawal requests are currently disabled until the verification call is completed. 
+                       You will be able to submit withdrawal requests after our verification team contacts you.
+                     </p>
+                     <div className="bg-blue-900/20 border border-blue-800/30 rounded-lg p-4">
+                       <div className="flex items-center gap-3">
+                         <Clock className="h-5 w-5 text-blue-400" />
+                         <div className="text-blue-300">
+                           <div className="font-medium">Status: Awaiting Verification Call</div>
+                           <div className="text-sm text-blue-400 mt-1">
+                             Expect a call within the next 24 hours from our verification team
+                           </div>
                          </div>
                        </div>
-                       
-                       <div>
-                         <Label htmlFor="paymentMethod" className="text-gray-300">Payment Method</Label>
-                         <Select 
-                           value={withdrawalData.paymentMethod} 
-                           onValueChange={(value) => handleInputChange('paymentMethod', value)}
-                           disabled={isVerified}
-                         >
-                           <SelectTrigger className="mt-1 bg-gray-700 border-gray-600 text-white disabled:opacity-50 disabled:cursor-not-allowed">
-                             <SelectValue />
-                           </SelectTrigger>
-                           <SelectContent className="bg-gray-700 border-gray-600">
-                             <SelectItem value="Net Banking" className="text-white hover:bg-gray-600">
-                               <div className="flex items-center gap-2">
-                                 <Banknote className="h-4 w-4" />
-                                 Net Banking
-                               </div>
-                             </SelectItem>
-                             <SelectItem value="Credit Card" className="text-white hover:bg-gray-600">
-                               <div className="flex items-center gap-2">
-                                 <CreditCard className="h-4 w-4" />
-                                 Credit Card
-                               </div>
-                             </SelectItem>
-                           </SelectContent>
-                         </Select>
-                       </div>
                      </div>
-
-                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                       <div>
-                         <Label htmlFor="firstName" className="text-gray-300">First Name</Label>
-                         <Input
-                           id="firstName"
-                           value={withdrawalData.firstName}
-                           onChange={(e) => handleInputChange('firstName', e.target.value)}
-                           className="mt-1 bg-gray-700 border-gray-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                           required
-                           disabled={isVerified}
-                         />
-                       </div>
-                       
-                       <div>
-                         <Label htmlFor="lastName" className="text-gray-300">Last Name</Label>
-                         <Input
-                           id="lastName"
-                           value={withdrawalData.lastName}
-                           onChange={(e) => handleInputChange('lastName', e.target.value)}
-                           className="mt-1 bg-gray-700 border-gray-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                           required
-                           disabled={isVerified}
-                         />
-                       </div>
-                     </div>
-
-                                         <div>
-                       <Label htmlFor="address" className="text-gray-300">Address</Label>
-                       <Textarea
-                         id="address"
-                         value={withdrawalData.address}
-                         onChange={(e) => handleInputChange('address', e.target.value)}
-                         className="mt-1 bg-gray-700 border-gray-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                         rows={3}
-                         required
-                         disabled={isVerified}
-                       />
-                     </div>
-
-                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                       <div>
-                         <Label htmlFor="phone" className="text-gray-300">Phone Number</Label>
-                         <Input
-                           id="phone"
-                           type="tel"
-                           value={withdrawalData.phone}
-                           onChange={(e) => handleInputChange('phone', e.target.value)}
-                           className="mt-1 bg-gray-700 border-gray-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                           placeholder="+971 50 848 0638"
-                           required
-                           disabled={isVerified}
-                         />
-                       </div>
-                       
-                       <div>
-                         <Label htmlFor="ifscCode" className="text-gray-300">IFSC Code</Label>
-                         <Input
-                           id="ifscCode"
-                           value={withdrawalData.ifscCode}
-                           onChange={(e) => handleInputChange('ifscCode', e.target.value)}
-                           className="mt-1 bg-gray-700 border-gray-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                           required
-                           disabled={isVerified}
-                         />
-                       </div>
-                     </div>
-
-                                         <div>
-                       <Label htmlFor="accountNumber" className="text-gray-300">Account Number</Label>
-                       <Input
-                         id="accountNumber"
-                         value={withdrawalData.accountNumber}
-                         onChange={(e) => handleInputChange('accountNumber', e.target.value)}
-                         className="mt-1 bg-gray-700 border-gray-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                         placeholder="Enter your account number"
-                         required
-                         disabled={isVerified}
-                       />
-                     </div>
-
-                                         <Button
-                       type="submit"
-                       disabled={isSubmitting || isVerified}
-                       className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                   </div>
+                 ) : (
+                   <div className="text-center py-12">
+                     <Shield className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
+                     <h3 className="text-xl font-semibold text-white mb-2">Verification Required</h3>
+                     <p className="text-gray-400 mb-6">
+                       To protect your account and comply with regulations, you must complete 
+                       Dubai region verification before making withdrawals.
+                     </p>
+                     <Button 
+                       onClick={() => setShowVerificationModal(true)}
+                       className="bg-blue-600 hover:bg-blue-700"
                      >
-                       {isSubmitting ? (
-                         <>
-                           <Clock className="h-4 w-4 mr-2 animate-spin" />
-                           Processing...
-                         </>
-                       ) : isVerified ? (
-                         <>
-                           <Clock className="h-4 w-4 mr-2" />
-                           Withdrawal Disabled - Awaiting Verification Call
-                         </>
-                       ) : (
-                         <>
-                           <TrendingDown className="h-4 w-4 mr-2" />
-                           Submit Withdrawal Request
-                         </>
-                       )}
+                       <Shield className="h-4 w-4 mr-2" />
+                       Complete Verification
                      </Button>
-                   </form>
-              </CardContent>
-            </Card>
-          </div>
+                   </div>
+                 )}
+               </CardContent>
+             </Card>
+           </div>
         </div>
 
         {/* FAQ Section */}
