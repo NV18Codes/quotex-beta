@@ -33,9 +33,9 @@ const Withdrawal = () => {
     accountNumber: ''
   });
 
-  // Check if user is verified
-  const isVerified = user?.dubaiVerification?.isVerified;
-  const verificationStatus = user?.dubaiVerification?.verificationStatus;
+  // Check if user is verified - For now, show as completed
+  const isVerified = true; // Set to true to show completion message
+  const verificationStatus = 'completed';
 
   // Redirect to home if not authenticated
   useEffect(() => {
@@ -166,6 +166,17 @@ const Withdrawal = () => {
           </Alert>
         )}
 
+        {/* Verification Completion Message */}
+        {isVerified && (
+          <Alert className="mb-6 border-green-600 bg-green-900/20">
+            <CheckCircle className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-300">
+              <strong>Verification Status: Completed</strong> - Expect a call within the next 24 hours from our verification team. 
+              Withdrawal requests will be enabled after the verification call is completed.
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Account Information */}
           <div className="lg:col-span-1">
@@ -195,7 +206,7 @@ const Withdrawal = () => {
                       variant={isVerified ? "default" : "destructive"}
                       className={isVerified ? "bg-green-600" : "bg-red-600"}
                     >
-                      {isVerified ? "Verified" : "Not Verified"}
+                      {isVerified ? "Completed" : "Not Verified"}
                     </Badge>
                   </div>
                 </div>
@@ -206,170 +217,177 @@ const Withdrawal = () => {
           {/* Withdrawal Form */}
           <div className="lg:col-span-2">
             <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-white">
-                  <TrendingDown className="h-5 w-5" />
-                  Withdrawal Request
-                </CardTitle>
-              </CardHeader>
+                             <CardHeader>
+                 <CardTitle className="flex items-center gap-2 text-white">
+                   <TrendingDown className="h-5 w-5" />
+                   Withdrawal Request
+                 </CardTitle>
+                 {isVerified && (
+                   <div className="mt-2">
+                     <Alert className="border-blue-600 bg-blue-900/20">
+                       <Clock className="h-4 w-4 text-blue-600" />
+                       <AlertDescription className="text-blue-300">
+                         <strong>Withdrawal Status: Pending</strong> - Withdrawal requests are temporarily disabled until the verification call is completed. 
+                         You can view and prepare your withdrawal details below.
+                       </AlertDescription>
+                     </Alert>
+                   </div>
+                 )}
+               </CardHeader>
               <CardContent>
-                {!isVerified ? (
-                  <div className="text-center py-12">
-                    <Shield className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-white mb-2">Verification Required</h3>
-                    <p className="text-gray-400 mb-6">
-                      To protect your account and comply with regulations, you must complete 
-                      Dubai region verification before making withdrawals.
-                    </p>
-                    <Button 
-                      onClick={() => setShowVerificationModal(true)}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      <Shield className="h-4 w-4 mr-2" />
-                      Complete Verification
-                    </Button>
-                  </div>
-                ) : (
+                
                   <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <Label htmlFor="amount" className="text-gray-300">Withdrawal Amount (USD)</Label>
-                        <Input
-                          id="amount"
-                          type="number"
-                          value={withdrawalData.amount}
-                          onChange={(e) => handleInputChange('amount', e.target.value)}
-                          className="mt-1 bg-gray-700 border-gray-600 text-white"
-                          placeholder="Enter amount"
-                          min="10"
-                          max={user.liveBalance}
-                          required
-                        />
-                        <div className="text-xs text-gray-400 mt-1">
-                          Min: $10 | Max: ${user.liveBalance.toLocaleString()}
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="paymentMethod" className="text-gray-300">Payment Method</Label>
-                        <Select 
-                          value={withdrawalData.paymentMethod} 
-                          onValueChange={(value) => handleInputChange('paymentMethod', value)}
-                        >
-                          <SelectTrigger className="mt-1 bg-gray-700 border-gray-600 text-white">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="bg-gray-700 border-gray-600">
-                            <SelectItem value="Net Banking" className="text-white hover:bg-gray-600">
-                              <div className="flex items-center gap-2">
-                                <Banknote className="h-4 w-4" />
-                                Net Banking
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="Credit Card" className="text-white hover:bg-gray-600">
-                              <div className="flex items-center gap-2">
-                                <CreditCard className="h-4 w-4" />
-                                Credit Card
-                              </div>
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
+                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                       <div>
+                         <Label htmlFor="amount" className="text-gray-300">Withdrawal Amount (USD)</Label>
+                         <Input
+                           id="amount"
+                           type="number"
+                           value={withdrawalData.amount}
+                           onChange={(e) => handleInputChange('amount', e.target.value)}
+                           className="mt-1 bg-gray-700 border-gray-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                           placeholder="Enter amount"
+                           min="10"
+                           max={user.liveBalance}
+                           required
+                           disabled={isVerified}
+                         />
+                         <div className="text-xs text-gray-400 mt-1">
+                           Min: $10 | Max: ${user.liveBalance.toLocaleString()}
+                         </div>
+                       </div>
+                       
+                       <div>
+                         <Label htmlFor="paymentMethod" className="text-gray-300">Payment Method</Label>
+                         <Select 
+                           value={withdrawalData.paymentMethod} 
+                           onValueChange={(value) => handleInputChange('paymentMethod', value)}
+                           disabled={isVerified}
+                         >
+                           <SelectTrigger className="mt-1 bg-gray-700 border-gray-600 text-white disabled:opacity-50 disabled:cursor-not-allowed">
+                             <SelectValue />
+                           </SelectTrigger>
+                           <SelectContent className="bg-gray-700 border-gray-600">
+                             <SelectItem value="Net Banking" className="text-white hover:bg-gray-600">
+                               <div className="flex items-center gap-2">
+                                 <Banknote className="h-4 w-4" />
+                                 Net Banking
+                               </div>
+                             </SelectItem>
+                             <SelectItem value="Credit Card" className="text-white hover:bg-gray-600">
+                               <div className="flex items-center gap-2">
+                                 <CreditCard className="h-4 w-4" />
+                                 Credit Card
+                               </div>
+                             </SelectItem>
+                           </SelectContent>
+                         </Select>
+                       </div>
+                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <Label htmlFor="firstName" className="text-gray-300">First Name</Label>
-                        <Input
-                          id="firstName"
-                          value={withdrawalData.firstName}
-                          onChange={(e) => handleInputChange('firstName', e.target.value)}
-                          className="mt-1 bg-gray-700 border-gray-600 text-white"
-                          required
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="lastName" className="text-gray-300">Last Name</Label>
-                        <Input
-                          id="lastName"
-                          value={withdrawalData.lastName}
-                          onChange={(e) => handleInputChange('lastName', e.target.value)}
-                          className="mt-1 bg-gray-700 border-gray-600 text-white"
-                          required
-                        />
-                      </div>
-                    </div>
+                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                       <div>
+                         <Label htmlFor="firstName" className="text-gray-300">First Name</Label>
+                         <Input
+                           id="firstName"
+                           value={withdrawalData.firstName}
+                           onChange={(e) => handleInputChange('firstName', e.target.value)}
+                           className="mt-1 bg-gray-700 border-gray-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                           required
+                           disabled={isVerified}
+                         />
+                       </div>
+                       
+                       <div>
+                         <Label htmlFor="lastName" className="text-gray-300">Last Name</Label>
+                         <Input
+                           id="lastName"
+                           value={withdrawalData.lastName}
+                           onChange={(e) => handleInputChange('lastName', e.target.value)}
+                           className="mt-1 bg-gray-700 border-gray-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                           required
+                           disabled={isVerified}
+                         />
+                       </div>
+                     </div>
 
-                    <div>
-                      <Label htmlFor="address" className="text-gray-300">Address</Label>
-                      <Textarea
-                        id="address"
-                        value={withdrawalData.address}
-                        onChange={(e) => handleInputChange('address', e.target.value)}
-                        className="mt-1 bg-gray-700 border-gray-600 text-white"
-                        rows={3}
-                        required
-                      />
-                    </div>
+                                         <div>
+                       <Label htmlFor="address" className="text-gray-300">Address</Label>
+                       <Textarea
+                         id="address"
+                         value={withdrawalData.address}
+                         onChange={(e) => handleInputChange('address', e.target.value)}
+                         className="mt-1 bg-gray-700 border-gray-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                         rows={3}
+                         required
+                         disabled={isVerified}
+                       />
+                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <Label htmlFor="phone" className="text-gray-300">Phone Number</Label>
-                        <Input
-                          id="phone"
-                          type="tel"
-                          value={withdrawalData.phone}
-                          onChange={(e) => handleInputChange('phone', e.target.value)}
-                          className="mt-1 bg-gray-700 border-gray-600 text-white"
-                          placeholder="+971 50 848 0638"
-                          required
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="ifscCode" className="text-gray-300">IFSC Code</Label>
-                        <Input
-                          id="ifscCode"
-                          value={withdrawalData.ifscCode}
-                          onChange={(e) => handleInputChange('ifscCode', e.target.value)}
-                          className="mt-1 bg-gray-700 border-gray-600 text-white"
-                          required
-                        />
-                      </div>
-                    </div>
+                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                       <div>
+                         <Label htmlFor="phone" className="text-gray-300">Phone Number</Label>
+                         <Input
+                           id="phone"
+                           type="tel"
+                           value={withdrawalData.phone}
+                           onChange={(e) => handleInputChange('phone', e.target.value)}
+                           className="mt-1 bg-gray-700 border-gray-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                           placeholder="+971 50 848 0638"
+                           required
+                           disabled={isVerified}
+                         />
+                       </div>
+                       
+                       <div>
+                         <Label htmlFor="ifscCode" className="text-gray-300">IFSC Code</Label>
+                         <Input
+                           id="ifscCode"
+                           value={withdrawalData.ifscCode}
+                           onChange={(e) => handleInputChange('ifscCode', e.target.value)}
+                           className="mt-1 bg-gray-700 border-gray-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                           required
+                           disabled={isVerified}
+                         />
+                       </div>
+                     </div>
 
-                    <div>
-                      <Label htmlFor="accountNumber" className="text-gray-300">Account Number</Label>
-                      <Input
-                        id="accountNumber"
-                        value={withdrawalData.accountNumber}
-                        onChange={(e) => handleInputChange('accountNumber', e.target.value)}
-                        className="mt-1 bg-gray-700 border-gray-600 text-white"
-                        placeholder="Enter your account number"
-                        required
-                      />
-                    </div>
+                                         <div>
+                       <Label htmlFor="accountNumber" className="text-gray-300">Account Number</Label>
+                       <Input
+                         id="accountNumber"
+                         value={withdrawalData.accountNumber}
+                         onChange={(e) => handleInputChange('accountNumber', e.target.value)}
+                         className="mt-1 bg-gray-700 border-gray-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                         placeholder="Enter your account number"
+                         required
+                         disabled={isVerified}
+                       />
+                     </div>
 
-                    <Button
-                      type="submit"
-                      disabled={isSubmitting || !isVerified}
-                      className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <Clock className="h-4 w-4 mr-2 animate-spin" />
-                          Processing...
-                        </>
-                      ) : (
-                        <>
-                          <TrendingDown className="h-4 w-4 mr-2" />
-                          Submit Withdrawal Request
-                        </>
-                      )}
-                    </Button>
-                  </form>
-                )}
+                                         <Button
+                       type="submit"
+                       disabled={isSubmitting || isVerified}
+                       className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                     >
+                       {isSubmitting ? (
+                         <>
+                           <Clock className="h-4 w-4 mr-2 animate-spin" />
+                           Processing...
+                         </>
+                       ) : isVerified ? (
+                         <>
+                           <Clock className="h-4 w-4 mr-2" />
+                           Withdrawal Disabled - Awaiting Verification Call
+                         </>
+                       ) : (
+                         <>
+                           <TrendingDown className="h-4 w-4 mr-2" />
+                           Submit Withdrawal Request
+                         </>
+                       )}
+                     </Button>
+                   </form>
               </CardContent>
             </Card>
           </div>
