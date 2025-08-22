@@ -23,8 +23,8 @@ const Deposit = () => {
     amount: '100',
     paymentMethod: 'Bank Transfer',
     firstName: 'JONATHAN',
-    lastName: 'KENNETH JOSEPH',
-    email: 'jonathan.kenneth@example.com',
+    lastName: 'GEORGE JEREMIAH',
+    email: 'johathan23j@gmail.com',
             phone: '+971 50 848 0638'
   });
 
@@ -86,8 +86,8 @@ const Deposit = () => {
         amount: '100',
         paymentMethod: 'Bank Transfer',
         firstName: 'JONATHAN',
-        lastName: 'KENNETH JOSEPH',
-        email: 'jonathan.kenneth@example.com',
+        lastName: 'GEORGE JEREMIAH',
+        email: 'johathan23j@gmail.com',
         phone: '+971 50 848 0638'
       });
 
