@@ -35,7 +35,7 @@ interface Transaction {
 }
 
 const Transactions = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, getTrades } = useAuth();
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -50,7 +50,7 @@ const Transactions = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  // Load transactions from localStorage
+  // Load transactions from centralized state
   useEffect(() => {
     if (isAuthenticated) {
       loadTransactions();
@@ -58,8 +58,8 @@ const Transactions = () => {
   }, [isAuthenticated]);
 
   const loadTransactions = () => {
-    // Load trades from localStorage instead of clearing them
-    const savedTrades = JSON.parse(localStorage.getItem('userTrades') || '[]');
+    // Load trades from centralized state
+    const savedTrades = getTrades();
     const tradeTransactions = savedTrades.map((trade: any) => ({
       id: trade.id,
       order: trade.id.slice(-8).toUpperCase(),

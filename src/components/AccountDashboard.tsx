@@ -1,21 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Clock, DollarSign, TrendingUp, Target, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { 
-  DollarSign, 
-  TrendingUp, 
-  Clock, 
-  Shield, 
-  AlertCircle,
-  Eye,
-  EyeOff
-} from 'lucide-react';
+import { formatIndianTime } from '@/lib/utils';
 
 const AccountDashboard = () => {
   const { user } = useAuth();
-  const [showBalance, setShowBalance] = useState(true);
+  // Add live timer state for Indian timezone
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Live timer update every second for Indian timezone
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   if (!user) return null;
 
@@ -29,6 +31,7 @@ const AccountDashboard = () => {
   };
 
   const getBalanceDisplay = () => {
+    const showBalance = true; // Always show balance for now
     return showBalance ? formatCurrency(user.liveBalance) : '****.**';
   };
 
@@ -54,14 +57,7 @@ const AccountDashboard = () => {
                 <div className="text-right text-sm text-gray-400">
                   <div className="flex items-center gap-2 bg-gray-700 px-3 py-2 rounded-lg">
                     <Clock className="h-4 w-4" />
-                    {new Date().toLocaleString('en-US', {
-                      weekday: 'short',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      timeZoneName: 'short'
-                    })}
+                    {formatIndianTime(currentTime)}
                   </div>
                 </div>
               </div>

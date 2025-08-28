@@ -33,6 +33,9 @@ interface AuthContextType {
   setUserFromLocalStorage: () => void;
   saveTradesToStorage: (trades: any[]) => void;
   loadTradesFromStorage: () => any[];
+  addTrade: (trade: any) => void;
+  updateTrade: (tradeId: string, updates: any) => void;
+  getTrades: () => any[];
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -77,6 +80,20 @@ const justinUser: User = {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [trades, setTrades] = useState<any[]>([]);
+
+  // Load trades from localStorage on mount
+  useEffect(() => {
+    const savedTrades = loadTradesFromStorage();
+    setTrades(savedTrades);
+  }, []);
+
+  // Persist trades to localStorage whenever they change
+  useEffect(() => {
+    if (trades.length > 0) {
+      saveTradesToStorage(trades);
+    }
+  }, [trades]);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('qxTrader_user');
@@ -87,8 +104,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsAuthenticated(false);
     } else {
       const userData = JSON.parse(savedUser);
-      // Ensure live balance is always $1104
-      userData.liveBalance = 1104;
+      
+      // Ensure proper balance structure while preserving accumulated profits
+      if (userData.liveBalance < 1104) {
+        // If live balance is below base, reset to base (1104)
+        userData.liveBalance = 1104;
+      }
+      // If live balance is above 1104, it means there are accumulated profits - preserve them
+      
       setUser(userData);
       setIsAuthenticated(true);
     }
@@ -101,12 +124,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
-  // Ensure live balance stays fixed at $1104
-  useEffect(() => {
-    if (user && user.liveBalance !== 1104) {
-      setUser({ ...user, liveBalance: 1104 });
-    }
-  }, [user?.id, user?.email, user?.name]);
+  // REMOVED: The useEffect that was always resetting liveBalance to 1104
+  // This was overriding accumulated trade profits
 
   const login = async (email: string, password: string): Promise<boolean> => {
     let authenticatedUser: User | null = null;
@@ -116,8 +135,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const savedUser = localStorage.getItem('qxTrader_user');
       if (savedUser) {
         authenticatedUser = JSON.parse(savedUser);
-        // Ensure live balance is always $1104 regardless of saved state
-        authenticatedUser.liveBalance = 1104;
+        // Preserve accumulated profits from trades - don't reset liveBalance
+        // The base balance logic is handled in updateBalance function
       } else {
         authenticatedUser = justinUser;
         // Only set localStorage if new user
@@ -129,6 +148,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(authenticatedUser);
       setIsAuthenticated(true);
 
+      // Trade history is automatically preserved in localStorage
+      // No need to clear or modify it during login
+
       return true;
     }
 
@@ -136,6 +158,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
+    // Don't clear trade history - preserve it for when user logs back in
+    // localStorage.removeItem('userTrades'); // REMOVED - preserve trade history
     localStorage.removeItem('qxTrader_user');
     setUser(null);
     setIsAuthenticated(false);
@@ -146,11 +170,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       let updatedUser;
       
       if (type === 'deposit') {
-        // For deposits, only update demo balance, keep live balance fixed at $1104
+        // For deposits, only update demo balance, preserve live balance with accumulated profits
         updatedUser = {
           ...user,
           demoBalance: user.demoBalance + amount,
-          liveBalance: 1104 // Always keep live balance fixed
+          liveBalance: user.liveBalance // Preserve current live balance with accumulated profits
         };
       } else if (type === 'trade') {
         // For trades, update the live balance with profits/losses
@@ -182,6 +206,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Trade management functions
+  const addTrade = (trade: any) => {
+    setTrades(prev => [trade, ...prev]);
+  };
+
+  const updateTrade = (tradeId: string, updates: any) => {
+    setTrades(prev => 
+      prev.map(trade => 
+        trade.id === tradeId ? { ...trade, ...updates } : trade
+      )
+    );
+  };
+
+  const getTrades = () => trades;
+
+  // Real-time trade synchronization
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const savedTrades = loadTradesFromStorage();
+      // Only update if there are actual changes to avoid infinite loops
+      if (JSON.stringify(savedTrades) !== JSON.stringify(trades)) {
+        setTrades(savedTrades);
+      }
+    }, 2000); // Check every 2 seconds for external changes
+    
+    return () => clearInterval(interval);
+  }, [trades]);
 
 
   const value = {
@@ -192,7 +243,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     updateBalance,
     setUserFromLocalStorage,
     saveTradesToStorage,
-    loadTradesFromStorage
+    loadTradesFromStorage,
+    addTrade,
+    updateTrade,
+    getTrades
   };
 
   return (
@@ -236,6 +290,7 @@ export function getUnifiedTradeData(userTradeHistory?: any[]): {
 
 // Function to save trades to localStorage
 export function saveTradesToStorage(trades: any[]) {
+  // Always save trades, even if empty array, to ensure persistence
   localStorage.setItem('userTrades', JSON.stringify(trades));
 }
 

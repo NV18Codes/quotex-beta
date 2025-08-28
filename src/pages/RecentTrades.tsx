@@ -32,16 +32,11 @@ interface Trade {
 }
 
 const RecentTrades = () => {
-  const { user, loadTradesFromStorage } = useAuth();
-  const [trades, setTrades] = useState<Trade[]>([]);
+  const { user, getTrades } = useAuth();
+  // Get trades from centralized state
+  const trades = getTrades();
   const [tradeFilter, setTradeFilter] = useState<'all' | 'buy' | 'sell' | 'win' | 'loss'>('all');
   const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
-
-  // Load trades from localStorage on component mount
-  useEffect(() => {
-    const savedTrades = loadTradesFromStorage();
-    setTrades(savedTrades);
-  }, [loadTradesFromStorage]);
 
   // Calculate stats from trades
   const stats = useMemo(() => {

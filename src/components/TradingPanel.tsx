@@ -37,7 +37,7 @@ interface Trade {
 }
 
 const TradingPanel = () => {
-  const { user, updateBalance, saveTradesToStorage, loadTradesFromStorage } = useAuth();
+  const { user, updateBalance, addTrade, updateTrade, getTrades } = useAuth();
   const { toast } = useToast();
   const [activeTrades, setActiveTrades] = useState<Trade[]>([]);
   const [selectedSymbol, setSelectedSymbol] = useState('EUR/USD');
@@ -70,19 +70,21 @@ const TradingPanel = () => {
     { value: 600, label: '10 Minutes' }
   ];
 
-  // Load trades from localStorage on component mount
+  // Load trades from centralized state
   useEffect(() => {
-    const savedTrades = loadTradesFromStorage();
-    setActiveTrades(savedTrades);
-  }, [loadTradesFromStorage]);
+    const trades = getTrades();
+    setActiveTrades(trades);
+  }, [getTrades]);
 
-  // Save trades to localStorage whenever activeTrades changes
+  // Subscribe to trade updates
   useEffect(() => {
-    if (activeTrades.length > 0) {
-      saveTradesToStorage(activeTrades);
-    }
-  }, [activeTrades, saveTradesToStorage]);
-
+    const interval = setInterval(() => {
+      const trades = getTrades();
+      setActiveTrades(trades);
+    }, 1000); // Check for updates every second
+    
+    return () => clearInterval(interval);
+  }, [getTrades]);
 
   const handleTrade = (type: 'buy' | 'sell') => {
     if (!user) return;
@@ -103,7 +105,7 @@ const TradingPanel = () => {
     console.log(`Creating new trade: ${tradeId} with duration: ${tradeDuration}s`);
 
     // Add new trade to the beginning of the existing trade history
-    setActiveTrades(prev => [newTrade, ...prev]);
+    addTrade(newTrade);
     setIsTrading(true);
 
     // Simulate trade result after duration - ALWAYS WIN
@@ -111,13 +113,7 @@ const TradingPanel = () => {
       console.log(`Timeout completing trade: ${tradeId}`);
       const profit = tradeAmount * (0.7 + Math.random() * 0.6); // Always positive profit
 
-      setActiveTrades(prev => 
-        prev.map(trade => 
-          trade.id === tradeId && trade.status === 'pending'
-            ? { ...trade, status: 'completed', result: 'win', profit, timeLeft: 0 }
-            : trade
-        )
-      );
+      updateTrade(tradeId, { status: 'completed', result: 'win', profit, timeLeft: 0 });
 
       // Update balance
       if (updateBalance) {
@@ -183,7 +179,7 @@ const TradingPanel = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [updateBalance]);
+  }, [updateBalance, updateTrade]);
 
   // Additional safety mechanism to complete trades that might be stuck
   useEffect(() => {
@@ -216,7 +212,7 @@ const TradingPanel = () => {
     }, 2000); // Check every 2 seconds for stuck trades
 
     return () => clearInterval(safetyInterval);
-  }, [updateBalance]);
+  }, [updateBalance, updateTrade]);
 
   // Force completion mechanism for stuck trades (runs every 5 seconds)
   useEffect(() => {
@@ -255,7 +251,7 @@ const TradingPanel = () => {
     }, 5000); // Check every 5 seconds
 
     return () => clearInterval(forceCompletionInterval);
-  }, [updateBalance]);
+  }, [updateBalance, updateTrade]);
 
   // FINAL safety: Always complete any pending trade with timeLeft <= 0
   useEffect(() => {
@@ -279,7 +275,7 @@ const TradingPanel = () => {
       });
       return hasChanges ? updatedTrades : prev;
     });
-  }, [activeTrades, updateBalance]);
+  }, [activeTrades, updateBalance, updateTrade]);
 
   // Defensive: Clamp any negative timeLeft to 0
   useEffect(() => {
@@ -290,7 +286,7 @@ const TradingPanel = () => {
           : trade
       )
     );
-  }, [activeTrades]);
+  }, [activeTrades, updateTrade]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);

@@ -22,19 +22,24 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react';
+import { formatIndianTime } from '@/lib/utils';
 
 const TradingDashboard = () => {
-  const { user, loadTradesFromStorage } = useAuth();
+  const { user, getTrades } = useAuth();
   // Use fixed live balance from user context, no local state fluctuations
   const liveBalance = user?.liveBalance || 1104;
-  // Load trades from localStorage
-  const [trades, setTrades] = useState<any[]>([]);
+  // Get trades from centralized state
+  const trades = getTrades();
+  // Add live timer state for Indian timezone
+  const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Load trades from localStorage on component mount
+  // Live timer update every second for Indian timezone
   useEffect(() => {
-    const savedTrades = loadTradesFromStorage();
-    setTrades(savedTrades);
-  }, [loadTradesFromStorage]);
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Calculate stats from trades
   const stats = useMemo(() => {
@@ -161,14 +166,7 @@ const TradingDashboard = () => {
             </div>
             <div className="text-right">
               <div className="text-sm text-gray-400">
-                {new Date().toLocaleString('en-US', {
-                  weekday: 'short',
-                  month: 'short',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  timeZoneName: 'short'
-                })}
+                {formatIndianTime(currentTime)}
               </div>
               <Badge className="bg-green-600 text-white mt-1">
                 <Activity className="h-3 w-3 mr-1" />

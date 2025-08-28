@@ -51,7 +51,7 @@ interface Trade {
 }
 
 const Markets = () => {
-  const { user, updateBalance, saveTradesToStorage, loadTradesFromStorage } = useAuth();
+  const { user, updateBalance, addTrade, updateTrade, getTrades } = useAuth();
   const [markets, setMarkets] = useState<Market[]>([]);
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [tradeAmount, setTradeAmount] = useState(100);
@@ -140,18 +140,21 @@ const Markets = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Load trades from localStorage on component mount
+  // Load trades from centralized state
   useEffect(() => {
-    const savedTrades = loadTradesFromStorage();
-    setActiveTrades(savedTrades);
-  }, [loadTradesFromStorage]);
+    const trades = getTrades();
+    setActiveTrades(trades);
+  }, [getTrades]);
 
-  // Save trades to localStorage whenever activeTrades changes
+  // Subscribe to trade updates
   useEffect(() => {
-    if (activeTrades.length > 0) {
-      saveTradesToStorage(activeTrades);
-    }
-  }, [activeTrades, saveTradesToStorage]);
+    const interval = setInterval(() => {
+      const trades = getTrades();
+      setActiveTrades(trades);
+    }, 1000); // Check for updates every second
+    
+    return () => clearInterval(interval);
+  }, [getTrades]);
 
 
   const handleTrade = (type: 'buy' | 'sell') => {
@@ -168,20 +171,14 @@ const Markets = () => {
     };
 
     // Add new trade to the beginning of the existing trade history
-    setActiveTrades(prev => [newTrade, ...prev]);
+    addTrade(newTrade);
     setIsTrading(true);
 
     // Simulate trade result after duration - ALWAYS WIN
     setTimeout(() => {
       const profit = tradeAmount * (0.7 + Math.random() * 0.6); // Always positive profit
       
-      setActiveTrades(prev => 
-        prev.map(trade => 
-          trade.id === newTrade.id 
-            ? { ...trade, status: 'completed', result: 'win', profit }
-            : trade
-        )
-      );
+      updateTrade(newTrade.id, { status: 'completed', result: 'win', profit });
 
       // Update balance
       if (updateBalance) {
