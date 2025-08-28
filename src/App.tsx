@@ -13,7 +13,7 @@ import NotFound from './pages/NotFound';
 import Deposit from './pages/Deposit';
 import Withdrawal from './pages/Withdrawal';
 import Transactions from './pages/Transactions';
-import VerificationAdmin from './components/VerificationAdmin';
+
 import { Toaster } from './components/ui/toaster';
 
 function App() {
@@ -34,7 +34,7 @@ function App() {
           <Route path="/deposit" element={<Deposit />} />
           <Route path="/withdrawal" element={<Withdrawal />} />
           <Route path="/transactions" element={<Transactions />} />
-          <Route path="/verification-admin" element={<VerificationAdmin />} />
+  
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>

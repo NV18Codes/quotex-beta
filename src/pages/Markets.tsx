@@ -51,13 +51,13 @@ interface Trade {
 }
 
 const Markets = () => {
-  const { user, updateBalance } = useAuth();
+  const { user, updateBalance, saveTradesToStorage, loadTradesFromStorage } = useAuth();
   const [markets, setMarkets] = useState<Market[]>([]);
-  const [activeTrades, setActiveTrades] = useState<Trade[]>([]);
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [tradeAmount, setTradeAmount] = useState(100);
   const [tradeDuration, setTradeDuration] = useState(60);
   const [isTrading, setIsTrading] = useState(false);
+  const [activeTrades, setActiveTrades] = useState<Trade[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [tradeFilter, setTradeFilter] = useState('all');
 
@@ -140,39 +140,19 @@ const Markets = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Load existing trades from localStorage
+  // Load trades from localStorage on component mount
   useEffect(() => {
-    const savedTrades = localStorage.getItem('userTrades');
-    if (savedTrades) {
-      const parsedTrades = JSON.parse(savedTrades).map((trade: any) => ({
-        ...trade,
-        timestamp: new Date(trade.timestamp)
-      }));
-      setActiveTrades(parsedTrades);
-    } else {
-      setActiveTrades([]); // No fallback to user?.tradeHistory or mock data
-      localStorage.setItem('userTrades', JSON.stringify([]));
-    }
-  }, [user]);
+    const savedTrades = loadTradesFromStorage();
+    setActiveTrades(savedTrades);
+  }, [loadTradesFromStorage]);
 
-  // Save trades to localStorage whenever trades change
+  // Save trades to localStorage whenever activeTrades changes
   useEffect(() => {
     if (activeTrades.length > 0) {
-      localStorage.setItem('userTrades', JSON.stringify(activeTrades));
+      saveTradesToStorage(activeTrades);
     }
-  }, [activeTrades]);
+  }, [activeTrades, saveTradesToStorage]);
 
-  useEffect(() => {
-    const handleUpdate = () => {
-      const savedTrades = localStorage.getItem('userTrades');
-      if (savedTrades) {
-        // Re-parse and update state or force re-render
-        window.location.reload(); // TEMP: force reload for instant sync
-      }
-    };
-    window.addEventListener('trades-updated', handleUpdate);
-    return () => window.removeEventListener('trades-updated', handleUpdate);
-  }, []);
 
   const handleTrade = (type: 'buy' | 'sell') => {
     if (!selectedMarket || !user) return;
@@ -205,7 +185,7 @@ const Markets = () => {
 
       // Update balance
       if (updateBalance) {
-        updateBalance(profit);
+        updateBalance(profit, 'trade');
       }
     }, tradeDuration * 1000);
   };

@@ -20,7 +20,7 @@ import {
   AlertCircle,
   Filter
 } from 'lucide-react';
-import DubaiVerificationModal from './DubaiVerificationModal';
+
 import { useToast } from '@/hooks/use-toast';
 
 interface Trade {
@@ -37,7 +37,7 @@ interface Trade {
 }
 
 const TradingPanel = () => {
-  const { user, updateBalance } = useAuth();
+  const { user, updateBalance, saveTradesToStorage, loadTradesFromStorage } = useAuth();
   const { toast } = useToast();
   const [activeTrades, setActiveTrades] = useState<Trade[]>([]);
   const [selectedSymbol, setSelectedSymbol] = useState('EUR/USD');
@@ -45,7 +45,7 @@ const TradingPanel = () => {
   const [tradeDuration, setTradeDuration] = useState(60);
   const [isTrading, setIsTrading] = useState(false);
   const [tradeFilter, setTradeFilter] = useState<'all' | 'buy' | 'sell' | 'pending' | 'completed'>('all');
-  const [showVerificationModal, setShowVerificationModal] = useState(false);
+
 
   const symbols = [
     { value: 'EUR/USD', label: 'EUR/USD', name: 'Euro / US Dollar' },
@@ -70,39 +70,19 @@ const TradingPanel = () => {
     { value: 600, label: '10 Minutes' }
   ];
 
-  // Load existing trades from localStorage on component mount
+  // Load trades from localStorage on component mount
   useEffect(() => {
-    const savedTrades = localStorage.getItem('userTrades');
-    if (savedTrades) {
-      try {
-        const parsedTrades = JSON.parse(savedTrades).map((trade: Trade) => ({
-          ...trade,
-          timestamp: new Date(trade.timestamp),
-          timeLeft: trade.timeLeft !== undefined ? trade.timeLeft : 0,
-          result: trade.result === 'win' ? 'win' : trade.result === 'loss' ? 'loss' : undefined,
-        })) as Trade[];
-        setActiveTrades(parsedTrades);
-      } catch (error) {
-        console.error('Error parsing saved trades:', error);
-        setActiveTrades([]); // If parsing fails, set to empty
-        localStorage.setItem('userTrades', JSON.stringify([]));
-      }
-    } else {
-      setActiveTrades([]); // No fallback to user?.tradeHistory or mock data
-      localStorage.setItem('userTrades', JSON.stringify([]));
-    }
-  }, [user]);
+    const savedTrades = loadTradesFromStorage();
+    setActiveTrades(savedTrades);
+  }, [loadTradesFromStorage]);
 
-  // Save trades to localStorage whenever trades change
+  // Save trades to localStorage whenever activeTrades changes
   useEffect(() => {
     if (activeTrades.length > 0) {
-      try {
-        localStorage.setItem('userTrades', JSON.stringify(activeTrades));
-      } catch (error) {
-        console.error('Error saving trades to localStorage:', error);
-      }
+      saveTradesToStorage(activeTrades);
     }
-  }, [activeTrades]);
+  }, [activeTrades, saveTradesToStorage]);
+
 
   const handleTrade = (type: 'buy' | 'sell') => {
     if (!user) return;
@@ -141,7 +121,7 @@ const TradingPanel = () => {
 
       // Update balance
       if (updateBalance) {
-        updateBalance(profit);
+        updateBalance(profit, 'trade');
       }
       
       setIsTrading(false);
@@ -176,7 +156,7 @@ const TradingPanel = () => {
               
               // Update balance for completed trade
               if (updateBalance) {
-                updateBalance(profit);
+                updateBalance(profit, 'trade');
               }
               
               return { 
@@ -217,7 +197,7 @@ const TradingPanel = () => {
             const profit = trade.amount * (0.7 + Math.random() * 0.6);
             
             if (updateBalance) {
-              updateBalance(profit);
+              updateBalance(profit, 'trade');
             }
             
             return { 
@@ -255,7 +235,7 @@ const TradingPanel = () => {
               const profit = trade.amount * (0.7 + Math.random() * 0.6);
               
               if (updateBalance) {
-                updateBalance(profit);
+                updateBalance(profit, 'trade');
               }
               
               return { 
@@ -285,7 +265,7 @@ const TradingPanel = () => {
         if (trade.status === 'pending' && trade.timeLeft !== undefined && trade.timeLeft <= 0) {
           hasChanges = true;
           const profit = trade.amount * (0.7 + Math.random() * 0.6);
-          if (updateBalance) updateBalance(profit);
+          if (updateBalance) updateBalance(profit, 'trade');
           const { status, result, ...rest } = trade;
           return {
             ...rest,
@@ -598,12 +578,7 @@ const TradingPanel = () => {
         </CardContent>
       </Card>
 
-      {/* Dubai Verification Modal */}
-      <DubaiVerificationModal
-        isOpen={showVerificationModal}
-        onClose={() => setShowVerificationModal(false)}
-      />
-    </div>
+           </div>
   );
 };
 

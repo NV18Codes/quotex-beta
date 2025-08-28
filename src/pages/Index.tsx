@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -22,14 +22,35 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react';
-import { getUnifiedTradeData } from '@/contexts/AuthContext';
 
 const TradingDashboard = () => {
-  const { user } = useAuth();
+  const { user, loadTradesFromStorage } = useAuth();
   // Use fixed live balance from user context, no local state fluctuations
-  const liveBalance = user?.liveBalance || 80000;
-  // Only use user's actual trade history
-  const { trades: unifiedTrades, stats: unifiedStats } = getUnifiedTradeData(user?.tradeHistory);
+  const liveBalance = user?.liveBalance || 1104;
+  // Load trades from localStorage
+  const [trades, setTrades] = useState<any[]>([]);
+
+  // Load trades from localStorage on component mount
+  useEffect(() => {
+    const savedTrades = loadTradesFromStorage();
+    setTrades(savedTrades);
+  }, [loadTradesFromStorage]);
+
+  // Calculate stats from trades
+  const stats = useMemo(() => {
+    const completedTrades = trades.filter(trade => trade.status === 'completed');
+    const totalTrades = completedTrades.length;
+    const winningTrades = completedTrades.filter(trade => trade.result === 'win').length;
+    const winRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0;
+    const totalProfit = completedTrades.reduce((sum, trade) => sum + (trade.profit || 0), 0);
+    
+    return {
+      totalTrades,
+      winRate: Math.round(winRate),
+      totalProfit: Math.round(totalProfit * 100) / 100,
+      winningTrades
+    };
+  }, [trades]);
 
   // Remove fallback that triggers getUnifiedTradeData() with no arguments
   // useEffect(() => {
@@ -50,21 +71,10 @@ const TradingDashboard = () => {
 
   // Live balance is now fixed at $80,000 - no random fluctuations
 
-  // Listen for the 'trades-updated' event
-  useEffect(() => {
-    const handleUpdate = () => {
-      const savedTrades = localStorage.getItem('userTrades');
-      if (savedTrades) {
-        // Re-parse and update state or force re-render
-        window.location.reload(); // TEMP: force reload for instant sync
-      }
-    };
-    window.addEventListener('trades-updated', handleUpdate);
-    return () => window.removeEventListener('trades-updated', handleUpdate);
-  }, []);
+
 
   // Most recent trades for display
-  const recentTrades = unifiedTrades
+  const recentTrades = trades
     .filter(trade => trade.status === 'completed')
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
     .slice(0, 10);
@@ -86,32 +96,32 @@ const TradingDashboard = () => {
   const quickStats = [
     {
       title: 'Total Trades',
-      value: unifiedStats.totalTrades.toLocaleString(),
+      value: stats.totalTrades.toLocaleString(),
       change: '+12 today',
       isPositive: true,
       icon: Target
     },
     {
       title: 'Win Rate',
-      value: `${unifiedStats.winRate.toFixed(0)}%`,
+      value: `${stats.winRate}%`,
       change: '+2.5% this week',
       isPositive: true,
       icon: TrendingUp
     },
     {
       title: 'Total P&L',
-      value: unifiedStats.totalProfit > 0 ? `+$${unifiedStats.totalProfit.toFixed(2)}` : `$${unifiedStats.totalProfit.toFixed(2)}`,
+      value: stats.totalProfit > 0 ? `+$${stats.totalProfit.toFixed(2)}` : `$${stats.totalProfit.toFixed(2)}`,
       change: '+$1,250 today',
       isPositive: true,
       icon: DollarSign
     },
-    {
-      title: 'Live Balance',
-              value: `$${liveBalance.toLocaleString('en-US')}`,
-              change: 'Fixed at $100,343',
-      isPositive: true,
-      icon: Activity
-    }
+         {
+       title: 'Live Balance',
+       value: `$${liveBalance.toLocaleString('en-US')}`,
+       change: 'Fixed at $1,104',
+       isPositive: true,
+       icon: Activity
+     }
   ];
 
   return (
@@ -137,11 +147,11 @@ const TradingDashboard = () => {
                 </Badge>
                 <Badge className="bg-green-600 text-white">
                   <TrendingUp className="h-3 w-3 mr-1" />
-                  {user?.winRate}% Win Rate
+                  {stats.winRate}% Win Rate
                 </Badge>
                 <Badge className="bg-blue-600 text-white">
                   <DollarSign className="h-3 w-3 mr-1" />
-                  {unifiedStats.totalProfit > 0 ? `+$${unifiedStats.totalProfit.toFixed(2)}` : `$${unifiedStats.totalProfit.toFixed(2)}`}
+                  {stats.totalProfit > 0 ? `+$${stats.totalProfit.toFixed(2)}` : `$${stats.totalProfit.toFixed(2)}`}
                 </Badge>
                 <Badge className="bg-green-600 text-white">
                   <DollarSign className="h-3 w-3 mr-1" />
