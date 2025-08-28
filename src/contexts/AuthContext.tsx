@@ -78,7 +78,7 @@ const jonathanUser: User = {
   name: 'Jonathan George Jeremiah',
   email: 'johathan23j@gmail.com', // Updated to match login credentials
   demoBalance: 10000,
-  liveBalance: 80000,
+  liveBalance: 100343,
   totalTrades: 0,
   winRate: 0,
   totalPnL: 0,
@@ -106,8 +106,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsAuthenticated(false);
     } else {
       const userData = JSON.parse(savedUser);
-      // Ensure live balance is always $80,000
-      userData.liveBalance = 80000;
+      // Ensure live balance is always $100,343
+      userData.liveBalance = 100343;
       setUser(userData);
       setIsAuthenticated(true);
     }
@@ -125,10 +125,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
-  // Ensure live balance stays fixed at $80,000
+  // Ensure live balance stays fixed at $100,343
   useEffect(() => {
-    if (user && user.liveBalance !== 80000) {
-      setUser({ ...user, liveBalance: 80000 });
+    if (user && user.liveBalance !== 100343) {
+      setUser({ ...user, liveBalance: 100343 });
     }
   }, [user?.id, user?.email, user?.name]);
 
@@ -140,8 +140,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const savedUser = localStorage.getItem('qxTrader_user');
       if (savedUser) {
         authenticatedUser = JSON.parse(savedUser);
-        // Ensure live balance is always $80,000 regardless of saved state
-        authenticatedUser.liveBalance = 80000;
+        // Ensure live balance is always $100,343 regardless of saved state
+        authenticatedUser.liveBalance = 100343;
       } else {
         authenticatedUser = jonathanUser;
         // Only set localStorage if new user
@@ -172,11 +172,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateBalance = (amount: number) => {
     if (user) {
-      // For deposits, only update demo balance, keep live balance fixed at $80,000
+      // For deposits, only update demo balance, keep live balance fixed at $100,343
       const updatedUser = {
         ...user,
         demoBalance: user.demoBalance + amount,
-        liveBalance: 80000 // Always keep live balance fixed
+        liveBalance: 100343 // Always keep live balance fixed
       };
       setUser(updatedUser);
       localStorage.setItem('qxTrader_user', JSON.stringify(updatedUser));
