@@ -248,7 +248,7 @@ const UserSettings = () => {
                       <div>
                         <Label className="text-gray-300">Live Balance</Label>
                         <div className="text-lg font-semibold text-green-400">
-                          ${user?.liveBalance.toLocaleString()}
+                          ${user?.liveBalance.toLocaleString('en-US')}
                         </div>
                       </div>
                     </div>

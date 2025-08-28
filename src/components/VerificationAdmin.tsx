@@ -127,7 +127,7 @@ const VerificationAdmin = () => {
                 <div>
                   <h4 className="font-medium text-sm text-gray-700 mb-2">Account Details</h4>
                   <div className="space-y-2 text-sm">
-                    <div><strong>Balance:</strong> ${verification.balance.toLocaleString()}</div>
+                    <div><strong>Balance:</strong> ${verification.balance.toLocaleString('en-US')}</div>
                     <div><strong>Government ID:</strong> {verification.governmentId}</div>
                     <div><strong>Submitted:</strong> {verification.submittedAt.toLocaleDateString()}</div>
                   </div>

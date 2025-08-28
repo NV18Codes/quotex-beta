@@ -107,8 +107,8 @@ const TradingDashboard = () => {
     },
     {
       title: 'Live Balance',
-      value: `$${liveBalance.toLocaleString()}`,
-      change: 'Fixed at $80,000',
+              value: `$${liveBalance.toLocaleString('en-US')}`,
+              change: 'Fixed at $100,343',
       isPositive: true,
       icon: Activity
     }
@@ -126,7 +126,7 @@ const TradingDashboard = () => {
               <p className="text-gray-400 mt-2">
                 Ready to make your next trade? Current balance:
                 <span className="font-semibold text-green-400 ml-1">
-                  ${liveBalance.toLocaleString()}
+                  ${liveBalance.toLocaleString('en-US')}
                 </span>
                 <span className="text-xs text-gray-500 ml-2">(Live updates)</span>
               </p>
@@ -145,7 +145,7 @@ const TradingDashboard = () => {
                 </Badge>
                 <Badge className="bg-green-600 text-white">
                   <DollarSign className="h-3 w-3 mr-1" />
-                  {liveBalance.toLocaleString()}
+                  {liveBalance.toLocaleString('en-US')}
                 </Badge>
               </div>
             </div>

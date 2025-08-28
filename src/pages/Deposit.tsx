@@ -148,7 +148,7 @@ const Deposit = () => {
               <CardContent className="space-y-4">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-green-400">
-                    ${user.liveBalance.toLocaleString()}
+                    ${user.liveBalance.toLocaleString('en-US')}
                   </div>
                   <div className="text-sm text-gray-400">Current balance</div>
                 </div>

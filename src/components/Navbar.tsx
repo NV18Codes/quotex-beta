@@ -216,7 +216,7 @@ const Navbar = () => {
                   {/* Balance Display */}
                   <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-lg px-4 py-2 shadow-lg">
                     <Badge className="bg-transparent text-white border-0 text-sm font-semibold">
-                      ${user?.liveBalance.toLocaleString()}
+                      ${user?.liveBalance.toLocaleString('en-US')}
                     </Badge>
                   </div>
                   
@@ -357,7 +357,7 @@ const Navbar = () => {
                       <div className="text-xs text-gray-400 mb-2">Live Account</div>
                       <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-lg px-3 py-1 inline-block">
                         <Badge className="bg-transparent text-white border-0 text-sm font-semibold">
-                          ${user?.liveBalance.toLocaleString()}
+                          ${user?.liveBalance.toLocaleString('en-US')}
                         </Badge>
                       </div>
                     </div>
