@@ -108,46 +108,26 @@ const TradingPanel = () => {
     addTrade(newTrade);
     setIsTrading(true);
 
-    // Simulate trade result after duration - ALWAYS WIN
-    const timeoutId = setTimeout(() => {
-      console.log(`Timeout completing trade: ${tradeId}`);
-      const profit = tradeAmount * (0.7 + Math.random() * 0.6); // Always positive profit
-
-      updateTrade(tradeId, { status: 'completed', result: 'win', profit, timeLeft: 0 });
-
-      // Update balance
-      if (updateBalance) {
-        updateBalance(profit, 'trade');
-      }
-      
-      setIsTrading(false);
-    }, (tradeDuration * 1000) + 500); // Add 500ms buffer to prevent race condition
-
-    // Cleanup timeout if component unmounts
-    return () => {
-      clearTimeout(timeoutId);
-      console.log(`Cleaned up timeout for trade: ${tradeId}`);
-    };
+    // The countdown mechanism will handle trade completion automatically
+    // No need for setTimeout - this prevents conflicts
   };
 
-  // Update countdown for pending trades
+  // Update countdown for pending trades - SIMPLIFIED AND FIXED
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveTrades(prev => {
         let hasChanges = false;
+        let hasCompletedTrades = false;
+        
         const updatedTrades = prev.map(trade => {
           if (trade.status === 'pending' && trade.timeLeft !== undefined && trade.timeLeft > 0) {
             const newTimeLeft = Math.max(0, trade.timeLeft - 1);
             
-            // Debug logging for production
-            if (newTimeLeft <= 5) {
-              console.log(`Trade ${trade.id}: Countdown at ${newTimeLeft}s`);
-            }
-            
-            // If countdown reaches 0, complete the trade as a win immediately
+            // If countdown reaches 0, complete the trade immediately
             if (newTimeLeft === 0) {
-              console.log(`Trade ${trade.id}: Completing trade as WIN`);
+              console.log(`Trade ${trade.id}: Countdown completed, finishing trade`);
               hasChanges = true;
+              hasCompletedTrades = true;
               const profit = trade.amount * (0.7 + Math.random() * 0.6); // Always positive profit
               
               // Update balance for completed trade
@@ -164,69 +144,38 @@ const TradingPanel = () => {
               };
             }
             
-            if (newTimeLeft !== trade.timeLeft) {
-              hasChanges = true;
-            }
-            
+            // Update countdown
+            hasChanges = true;
             return { ...trade, timeLeft: newTimeLeft };
           }
           return trade;
         });
         
-        // Only update state if there are actual changes
+        // Reset trading state if any trades completed
+        if (hasCompletedTrades) {
+          setIsTrading(false);
+        }
+        
         return hasChanges ? updatedTrades : prev;
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [updateBalance, updateTrade]);
+  }, [updateBalance]);
 
-  // Additional safety mechanism to complete trades that might be stuck
+  // Single safety mechanism for stuck trades (runs every 3 seconds)
   useEffect(() => {
     const safetyInterval = setInterval(() => {
       setActiveTrades(prev => {
         let hasChanges = false;
         const updatedTrades = prev.map(trade => {
-          if (trade.status === 'pending' && trade.timeLeft !== undefined && trade.timeLeft <= 0) {
-            console.log(`Trade ${trade.id}: Safety mechanism completing trade`);
-            hasChanges = true;
-            const profit = trade.amount * (0.7 + Math.random() * 0.6);
-            
-            if (updateBalance) {
-              updateBalance(profit, 'trade');
-            }
-            
-            return { 
-              ...trade, 
-              status: 'completed',
-              result: 'win',
-              profit, 
-              timeLeft: 0 
-            };
-          }
-          return trade;
-        });
-        
-        return hasChanges ? updatedTrades : prev;
-      });
-    }, 2000); // Check every 2 seconds for stuck trades
-
-    return () => clearInterval(safetyInterval);
-  }, [updateBalance, updateTrade]);
-
-  // Force completion mechanism for stuck trades (runs every 5 seconds)
-  useEffect(() => {
-    const forceCompletionInterval = setInterval(() => {
-      setActiveTrades(prev => {
-        let hasChanges = false;
-        const updatedTrades = prev.map(trade => {
-          // Force complete any pending trade that has been running for too long
+          // Complete any pending trade that has been running for too long
           if (trade.status === 'pending') {
             const tradeAge = Date.now() - new Date(trade.timestamp).getTime();
-            const maxDuration = (trade.duration + 10) * 1000; // Add 10 seconds buffer
+            const maxDuration = (trade.duration + 5) * 1000; // Add 5 seconds buffer
             
             if (tradeAge > maxDuration) {
-              console.log(`Trade ${trade.id}: Force completing stuck trade`);
+              console.log(`Trade ${trade.id}: Safety mechanism completing stuck trade`);
               hasChanges = true;
               const profit = trade.amount * (0.7 + Math.random() * 0.6);
               
@@ -248,36 +197,12 @@ const TradingPanel = () => {
         
         return hasChanges ? updatedTrades : prev;
       });
-    }, 5000); // Check every 5 seconds
+    }, 3000); // Check every 3 seconds
 
-    return () => clearInterval(forceCompletionInterval);
-  }, [updateBalance, updateTrade]);
+    return () => clearInterval(safetyInterval);
+  }, [updateBalance]);
 
-  // FINAL safety: Always complete any pending trade with timeLeft <= 0
-  useEffect(() => {
-    setActiveTrades(prev => {
-      let hasChanges = false;
-      const updatedTrades = prev.map(trade => {
-        if (trade.status === 'pending' && trade.timeLeft !== undefined && trade.timeLeft <= 0) {
-          hasChanges = true;
-          const profit = trade.amount * (0.7 + Math.random() * 0.6);
-          if (updateBalance) updateBalance(profit, 'trade');
-          const { status, result, ...rest } = trade;
-          return {
-            ...rest,
-            status: 'completed',
-            result: 'win',
-            profit,
-            timeLeft: 0,
-          };
-        }
-        return trade;
-      });
-      return hasChanges ? updatedTrades : prev;
-    });
-  }, [activeTrades, updateBalance, updateTrade]);
-
-  // Defensive: Clamp any negative timeLeft to 0
+  // Clean up any trades with invalid timeLeft values
   useEffect(() => {
     setActiveTrades(prev =>
       prev.map(trade =>
@@ -286,7 +211,7 @@ const TradingPanel = () => {
           : trade
       )
     );
-  }, [activeTrades, updateTrade]);
+  }, [activeTrades]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
