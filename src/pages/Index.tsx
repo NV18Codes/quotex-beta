@@ -26,12 +26,24 @@ import { formatIndianTime } from '@/lib/utils';
 
 const TradingDashboard = () => {
   const { user, getTrades } = useAuth();
-  // Use fixed live balance from user context, no local state fluctuations
-  const liveBalance = user?.liveBalance || 1200;
+  // Use live balance from user context - no fallback to prevent reset on refresh
+  const liveBalance = user?.liveBalance;
   // Get trades from centralized state
   const trades = getTrades();
   // Add live timer state for Indian timezone
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Show loading state if user data is not yet loaded
+  if (!user || liveBalance === undefined) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-gray-400 text-lg mb-4">Loading trading dashboard...</div>
+          <div className="text-gray-500 text-sm">Please wait while we load your account data</div>
+        </div>
+      </div>
+    );
+  }
 
   // Live timer update every second for Indian timezone
   useEffect(() => {
@@ -122,8 +134,8 @@ const TradingDashboard = () => {
     },
          {
        title: 'Live Balance',
-       value: `$${liveBalance.toLocaleString('en-US')}`,
-       change: 'Fixed at $1,104',
+       value: liveBalance ? `$${liveBalance.toLocaleString('en-US')}` : 'Loading...',
+       change: liveBalance ? `Base: $1200 + Profits: $${liveBalance - 1200}` : 'Loading...',
        isPositive: true,
        icon: Activity
      }
@@ -141,7 +153,7 @@ const TradingDashboard = () => {
               <p className="text-gray-400 mt-2">
                 Ready to make your next trade? Current balance:
                 <span className="font-semibold text-green-400 ml-1">
-                  ${liveBalance.toLocaleString('en-US')}
+                  {liveBalance ? `$${liveBalance.toLocaleString('en-US')}` : 'Loading...'}
                 </span>
                 <span className="text-xs text-gray-500 ml-2">(Live updates)</span>
               </p>
@@ -160,7 +172,7 @@ const TradingDashboard = () => {
                 </Badge>
                 <Badge className="bg-green-600 text-white">
                   <DollarSign className="h-3 w-3 mr-1" />
-                  {liveBalance.toLocaleString('en-US')}
+                  {liveBalance ? `$${liveBalance.toLocaleString('en-US')}` : 'Loading...'}
                 </Badge>
               </div>
             </div>

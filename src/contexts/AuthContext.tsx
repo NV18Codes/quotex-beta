@@ -105,12 +105,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       const userData = JSON.parse(savedUser);
       
-      // Ensure proper balance structure while preserving accumulated profits
-      if (userData.liveBalance < 1200) {
-        // If live balance is below base, reset to base (1200)
+      // IMPORTANT: Preserve accumulated profits - never reset below base unless genuinely corrupted
+      // Only reset if the balance is completely invalid (negative or undefined)
+      if (userData.liveBalance === undefined || userData.liveBalance === null || userData.liveBalance < 0) {
+        console.log('Invalid balance detected, resetting to base $1200');
         userData.liveBalance = 1200;
+      } else if (userData.liveBalance >= 1200) {
+        // Balance is valid and has accumulated profits - preserve them completely
+        console.log(`Preserving accumulated balance: $${userData.liveBalance} (Base: $1200 + Profits: $${userData.liveBalance - 1200})`);
+      } else if (userData.liveBalance < 1200 && userData.liveBalance > 0) {
+        // Balance is below base but positive - this might be from a loss, preserve it
+        console.log(`Preserving balance below base: $${userData.liveBalance} (Base: $1200, Loss: $${1200 - userData.liveBalance})`);
       }
-      // If live balance is above 1200, it means there are accumulated profits - preserve them
+      // If balance is exactly 0, it might be a new user or reset case
       
       setUser(userData);
       setIsAuthenticated(true);
@@ -133,18 +140,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (email === 'justin@thealphaandomega.org' && password === 'Galvin66') {
       // Check if user already exists in localStorage
       const savedUser = localStorage.getItem('qxTrader_user');
+      console.log('Login: Checking localStorage for existing user data...');
+      
       if (savedUser) {
         authenticatedUser = JSON.parse(savedUser);
-        // Preserve accumulated profits from trades - don't reset liveBalance
+        console.log(`Login: Found existing user data in localStorage`);
+        console.log(`Login: User balance before login: $${authenticatedUser.liveBalance}`);
+        console.log(`Login: User demo balance: $${authenticatedUser.demoBalance}`);
+        
+        // CRITICAL: Preserve accumulated profits from trades - never reset liveBalance
+        console.log(`Login: Preserving existing balance: $${authenticatedUser.liveBalance}`);
+        
+        // Double-check balance preservation
+        if (authenticatedUser.liveBalance >= 1200) {
+          const accumulatedProfits = authenticatedUser.liveBalance - 1200;
+          console.log(`Login: Balance preserved - Base: $1200 + Accumulated Profits: $${accumulatedProfits} = Total: $${authenticatedUser.liveBalance}`);
+        } else if (authenticatedUser.liveBalance > 0) {
+          console.log(`Login: Balance preserved - Current: $${authenticatedUser.liveBalance} (may be below base due to losses)`);
+        }
+        
         // The base balance logic is handled in updateBalance function
       } else {
+        console.log('Login: No existing user data found, creating new user');
         authenticatedUser = justinUser;
+        console.log('Login: New user created with base balance: $1200');
         // Only set localStorage if new user
         localStorage.setItem('qxTrader_user', JSON.stringify(authenticatedUser));
       }
     }
 
     if (authenticatedUser) {
+      console.log(`Login: Setting user with final balance: $${authenticatedUser.liveBalance}`);
       setUser(authenticatedUser);
       setIsAuthenticated(true);
 
@@ -158,9 +184,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
+    // CRITICAL: Preserve all user data including balance and trade history
+    // DO NOT remove user data from localStorage - just mark as not authenticated
+    
+    if (user) {
+      console.log(`Logout: Preserving balance: $${user.liveBalance} (Base: $1200 + Profits: $${Math.max(0, user.liveBalance - 1200)})`);
+      console.log('Logout: All user data preserved in localStorage for next login');
+      
+      // Save the current user state before logging out
+      // This ensures the balance and all data is preserved
+      localStorage.setItem('qxTrader_user', JSON.stringify(user));
+    }
+    
     // Don't clear trade history - preserve it for when user logs back in
     // localStorage.removeItem('userTrades'); // REMOVED - preserve trade history
-    localStorage.removeItem('qxTrader_user');
+    
+    // DON'T remove user data - just clear the session state
+    // localStorage.removeItem('qxTrader_user'); // REMOVED - preserve user data
     setUser(null);
     setIsAuthenticated(false);
   };
@@ -178,12 +218,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
       } else if (type === 'trade') {
         // For trades, update the live balance with profits/losses
-        // Start from base live balance of 1200 and add accumulated profits
+        // IMPORTANT: Start from base live balance of 1200 and add accumulated profits
+        // This ensures the base $1200 is never lost, only profits accumulate
         const currentLiveBalance = user.liveBalance || 1200;
         const baseLiveBalance = 1200;
-        const accumulatedProfits = currentLiveBalance - baseLiveBalance;
+        
+        // Calculate how much profit we already have accumulated
+        const accumulatedProfits = Math.max(0, currentLiveBalance - baseLiveBalance);
+        
+        // Add new profit/loss to accumulated profits
         const newAccumulatedProfits = accumulatedProfits + amount;
-        const newLiveBalance = baseLiveBalance + newAccumulatedProfits;
+        
+        // New live balance = base $1200 + all accumulated profits
+        // Use Math.max to ensure balance never goes below $1200
+        const newLiveBalance = Math.max(baseLiveBalance, baseLiveBalance + newAccumulatedProfits);
+        
+        console.log(`Balance Update: Current: $${currentLiveBalance}, Base: $${baseLiveBalance}, Accumulated: $${accumulatedProfits}, New Profit: $${amount}, New Total: $${newLiveBalance}`);
         
         updatedUser = {
           ...user,
