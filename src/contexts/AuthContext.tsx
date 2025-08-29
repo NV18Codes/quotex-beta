@@ -67,7 +67,7 @@ const justinUser: User = {
   name: 'Justin Raju Arokiaswamy',
   email: 'justin@thealphaandomega.org',
   demoBalance: 1000,
-  liveBalance: 1104,
+  liveBalance: 1200,
   totalTrades: 0,
   winRate: 0,
   totalPnL: 0,
@@ -106,11 +106,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const userData = JSON.parse(savedUser);
       
       // Ensure proper balance structure while preserving accumulated profits
-      if (userData.liveBalance < 1104) {
-        // If live balance is below base, reset to base (1104)
-        userData.liveBalance = 1104;
+      if (userData.liveBalance < 1200) {
+        // If live balance is below base, reset to base (1200)
+        userData.liveBalance = 1200;
       }
-      // If live balance is above 1104, it means there are accumulated profits - preserve them
+      // If live balance is above 1200, it means there are accumulated profits - preserve them
       
       setUser(userData);
       setIsAuthenticated(true);
@@ -124,7 +124,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
-  // REMOVED: The useEffect that was always resetting liveBalance to 1104
+  // REMOVED: The useEffect that was always resetting liveBalance to 1200
   // This was overriding accumulated trade profits
 
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -178,9 +178,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
       } else if (type === 'trade') {
         // For trades, update the live balance with profits/losses
-        // Start from base live balance of 1104 and add accumulated profits
-        const currentLiveBalance = user.liveBalance || 1104;
-        const baseLiveBalance = 1104;
+        // Start from base live balance of 1200 and add accumulated profits
+        const currentLiveBalance = user.liveBalance || 1200;
+        const baseLiveBalance = 1200;
         const accumulatedProfits = currentLiveBalance - baseLiveBalance;
         const newAccumulatedProfits = accumulatedProfits + amount;
         const newLiveBalance = baseLiveBalance + newAccumulatedProfits;

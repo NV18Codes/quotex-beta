@@ -27,7 +27,7 @@ import { formatIndianTime } from '@/lib/utils';
 const TradingDashboard = () => {
   const { user, getTrades } = useAuth();
   // Use fixed live balance from user context, no local state fluctuations
-  const liveBalance = user?.liveBalance || 1104;
+  const liveBalance = user?.liveBalance || 1200;
   // Get trades from centralized state
   const trades = getTrades();
   // Add live timer state for Indian timezone
