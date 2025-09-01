@@ -128,7 +128,7 @@ const AccountDashboard = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
                   <span className="text-sm text-gray-400">Total Trades</span>
-                  <span className="font-semibold text-white">{user.totalTrades.toLocaleString()}</span>
+                  <span className="font-semibold text-white">{user?.totalTrades?.toLocaleString() || '0'}</span>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-green-900/20 rounded-lg">
                   <span className="text-sm text-gray-400">Win Rate</span>

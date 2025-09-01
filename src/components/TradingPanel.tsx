@@ -377,6 +377,19 @@ const TradingPanel = () => {
     });
   }, [activeTrades, tradeFilter]);
 
+  // Safety check - if user is not available, show loading
+  if (!user) {
+    return (
+      <div className="space-y-6">
+        <Card className="bg-gray-800 border-gray-700">
+          <CardContent className="p-6">
+            <div className="text-center text-white">Loading...</div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Account Balance */}
@@ -389,13 +402,13 @@ const TradingPanel = () => {
             <div>
               <div className="text-sm text-gray-400">Demo Account</div>
               <div className="text-lg font-semibold text-white">
-                ${user?.demoBalance.toLocaleString()}
+                ${user?.demoBalance?.toLocaleString() || '0'}
               </div>
             </div>
             <div>
               <div className="text-sm text-gray-400">Live Account</div>
               <div className="text-lg font-semibold text-green-400">
-                ${user?.liveBalance.toLocaleString('en-US')}
+                ${user?.liveBalance?.toLocaleString('en-US') || '0'}
               </div>
             </div>
           </div>

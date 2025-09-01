@@ -59,19 +59,7 @@ export const useAuth = () => {
   return context;
 };
 
-// Two default users
-// Remove Samuel user definition
-// const samuelUser: User = {
-//   id: '1',
-//   name: 'Samuel Joseph',
-//   email: 'samuelkjoseph2020@gmail.com',
-//   demoBalance: 111111.45,
-//   liveBalance: 145897,
-//   totalTrades: 11893,
-//   winRate: 95,
-//   totalPnL: 349000,
-//   tradeHistory: generateTradeHistory()
-// };
+// Jonathan George Jeremiah user account
 
 const jonathanUser: User = {
   id: '2',

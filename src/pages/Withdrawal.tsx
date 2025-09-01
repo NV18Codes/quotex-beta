@@ -149,6 +149,22 @@ const Withdrawal = () => {
                          </div>
                        </div>
                      </div>
+                     
+                     {/* Crypto Withdrawal Option */}
+                     <div className="mt-4 p-4 bg-gray-800 border border-gray-700 rounded-lg">
+                       <div className="flex items-center justify-between">
+                         <div>
+                           <h4 className="text-white font-medium">Crypto Wallet Transfer</h4>
+                           <p className="text-gray-400 text-sm">Withdraw your entire balance via crypto</p>
+                         </div>
+                         <Button 
+                           onClick={() => navigate('/crypto-withdrawal')}
+                           className="bg-blue-600 hover:bg-blue-700"
+                         >
+                           Transfer to Crypto
+                         </Button>
+                       </div>
+                     </div>
                    </div>
                  ) : (
                    <div className="text-center py-12">

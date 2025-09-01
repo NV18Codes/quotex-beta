@@ -242,7 +242,7 @@ const UserSettings = () => {
                       <div>
                         <Label className="text-gray-300">Demo Balance</Label>
                         <div className="text-lg font-semibold text-blue-400">
-                          ${user?.demoBalance.toLocaleString()}
+                          ${user?.demoBalance?.toLocaleString() || '0'}
                         </div>
                       </div>
                       <div>
