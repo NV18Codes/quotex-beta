@@ -42,8 +42,12 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
-  updateBalance: (amount: number) => void;
+  updateBalance: (amount: number, type?: 'deposit' | 'trade') => void;
   setUserFromLocalStorage: () => void;
+  // Trade management methods
+  addTrade: (trade: any) => void;
+  updateTrade: (tradeId: string, updates: any) => void;
+  getTrades: () => any[];
   // Dubai verification methods
   submitDubaiVerification: (verificationData: any) => void;
   checkDubaiVerificationRequired: () => boolean;
@@ -158,17 +162,63 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsAuthenticated(false);
   };
 
-  const updateBalance = (amount: number) => {
+  const updateBalance = (amount: number, type: 'deposit' | 'trade' = 'deposit') => {
     if (user) {
-      // For deposits, only update demo balance, keep live balance fixed at $100,343
-      const updatedUser = {
-        ...user,
-        demoBalance: user.demoBalance + amount,
-        liveBalance: 100343 // Always keep live balance fixed
-      };
-      setUser(updatedUser);
-      localStorage.setItem('qxTrader_user', JSON.stringify(updatedUser));
+      if (type === 'deposit') {
+        // For deposits, only update demo balance, keep live balance fixed at $100,343
+        const updatedUser = {
+          ...user,
+          demoBalance: user.demoBalance + amount,
+          liveBalance: 100343 // Always keep live balance fixed
+        };
+        setUser(updatedUser);
+        localStorage.setItem('qxTrader_user', JSON.stringify(updatedUser));
+      } else if (type === 'trade') {
+        // For trades, update demo balance
+        const updatedUser = {
+          ...user,
+          demoBalance: user.demoBalance + amount,
+          liveBalance: 100343 // Always keep live balance fixed
+        };
+        setUser(updatedUser);
+        localStorage.setItem('qxTrader_user', JSON.stringify(updatedUser));
+      }
     }
+  };
+
+  // Trade management functions
+  const addTrade = (trade: any) => {
+    const savedTrades = localStorage.getItem('userTrades');
+    const trades = savedTrades ? JSON.parse(savedTrades) : [];
+    trades.unshift(trade);
+    localStorage.setItem('userTrades', JSON.stringify(trades));
+  };
+
+  const updateTrade = (tradeId: string, updates: any) => {
+    const savedTrades = localStorage.getItem('userTrades');
+    const trades = savedTrades ? JSON.parse(savedTrades) : [];
+    const updatedTrades = trades.map((trade: any) => 
+      trade.id === tradeId ? { ...trade, ...updates } : trade
+    );
+    localStorage.setItem('userTrades', JSON.stringify(updatedTrades));
+  };
+
+  const getTrades = () => {
+    const savedTrades = localStorage.getItem('userTrades');
+    if (savedTrades) {
+      try {
+        return JSON.parse(savedTrades).map((trade: any) => ({
+          ...trade,
+          timestamp: new Date(trade.timestamp),
+          timeLeft: trade.timeLeft !== undefined ? trade.timeLeft : 0,
+          result: trade.result === 'win' ? 'win' : trade.result === 'loss' ? 'loss' : undefined,
+        }));
+      } catch (error) {
+        console.error('Error parsing saved trades:', error);
+        return [];
+      }
+    }
+    return [];
   };
 
   // Add setUserFromLocalStorage
@@ -218,6 +268,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isAuthenticated,
     updateBalance,
     setUserFromLocalStorage,
+    addTrade,
+    updateTrade,
+    getTrades,
     submitDubaiVerification,
     checkDubaiVerificationRequired
   };

@@ -16,7 +16,6 @@ import {
   CheckCircle, 
   DollarSign, 
   ChevronDown,
-  HelpCircle,
   Plus,
   Settings
 } from 'lucide-react';
@@ -29,9 +28,8 @@ const CryptoWithdrawal = () => {
 
   const [formData, setFormData] = useState({
     toAddress: '',
-    amount: '',
+    amount: user?.liveBalance.toString() || '0',
     currency: 'ETH',
-    gasLimit: '21000',
     showAdvanced: false,
     data: ''
   });
@@ -52,12 +50,15 @@ const CryptoWithdrawal = () => {
     }));
   };
 
-  const sendEntireBalance = () => {
-    setFormData(prev => ({
-      ...prev,
-      amount: user?.liveBalance.toString() || '0'
-    }));
-  };
+  // Amount is always set to entire balance and cannot be changed
+  useEffect(() => {
+    if (user?.liveBalance) {
+      setFormData(prev => ({
+        ...prev,
+        amount: user.liveBalance.toString()
+      }));
+    }
+  }, [user?.liveBalance]);
 
   const validateAddress = (address: string) => {
     // Basic Ethereum address validation
@@ -105,9 +106,8 @@ const CryptoWithdrawal = () => {
       // Reset form
       setFormData({
         toAddress: '',
-        amount: '',
+        amount: user?.liveBalance.toString() || '0',
         currency: 'ETH',
-        gasLimit: '21000',
         showAdvanced: false,
         data: ''
       });
@@ -176,50 +176,33 @@ const CryptoWithdrawal = () => {
                   </div>
                 </div>
 
-                {/* Amount to Send */}
-                <div className="space-y-2">
-                  <Label htmlFor="amount" className="text-white">Amount to Send</Label>
-                  <div className="flex gap-2">
-                    <div className="flex-1 relative">
-                      <Input
-                        id="amount"
-                        type="number"
-                        placeholder="0.001"
-                        value={formData.amount}
-                        onChange={(e) => handleInputChange('amount', e.target.value)}
-                        className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                      />
-                    </div>
-                    <Button
-                      variant="outline"
-                      className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
-                    >
-                      {formData.currency}
-                      <ChevronDown className="h-4 w-4 ml-2" />
-                    </Button>
-                  </div>
-                  <button
-                    onClick={sendEntireBalance}
-                    className="text-blue-400 hover:text-blue-300 text-sm"
-                  >
-                    Send Entire Balance
-                  </button>
-                </div>
+                                 {/* Amount to Send - Fixed to Entire Balance */}
+                 <div className="space-y-2">
+                   <Label htmlFor="amount" className="text-white">Amount to Send (Entire Balance)</Label>
+                   <div className="flex gap-2">
+                     <div className="flex-1 relative">
+                       <Input
+                         id="amount"
+                         type="number"
+                         value={formData.amount}
+                         disabled
+                         className="bg-gray-600 border-gray-500 text-white cursor-not-allowed"
+                       />
+                     </div>
+                     <Button
+                       variant="outline"
+                       disabled
+                       className="bg-gray-600 border-gray-500 text-white cursor-not-allowed"
+                     >
+                       {formData.currency}
+                     </Button>
+                   </div>
+                   <div className="text-sm text-blue-400">
+                     ✓ Entire balance will be withdrawn
+                   </div>
+                 </div>
 
-                {/* Gas Limit */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="gasLimit" className="text-white">Gas Limit</Label>
-                    <HelpCircle className="h-4 w-4 text-gray-400" />
-                  </div>
-                  <Input
-                    id="gasLimit"
-                    type="number"
-                    value={formData.gasLimit}
-                    onChange={(e) => handleInputChange('gasLimit', e.target.value)}
-                    className="bg-gray-700 border-gray-600 text-white"
-                  />
-                </div>
+                
 
                 {/* Advanced Options */}
                 <div>
@@ -272,22 +255,18 @@ const CryptoWithdrawal = () => {
                 <CardTitle className="text-white">Transaction Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Amount</span>
-                    <span className="text-white font-medium">
-                      {formData.amount ? `${formData.amount} ${formData.currency}` : '0 ETH'}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Gas Limit</span>
-                    <span className="text-white font-medium">{formData.gasLimit}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Network</span>
-                    <Badge className="bg-green-600">Ethereum</Badge>
-                  </div>
-                </div>
+                                 <div className="space-y-3">
+                   <div className="flex items-center justify-between">
+                     <span className="text-gray-300">Amount</span>
+                     <span className="text-white font-medium">
+                       {formData.amount ? `${formData.amount} ${formData.currency}` : '0 ETH'}
+                     </span>
+                   </div>
+                   <div className="flex items-center justify-between">
+                     <span className="text-gray-300">Network</span>
+                     <Badge className="bg-green-600">Ethereum</Badge>
+                   </div>
+                 </div>
 
                 <div className="border-t border-gray-600 pt-4">
                   <div className="flex items-center justify-between">
@@ -309,12 +288,12 @@ const CryptoWithdrawal = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-sm text-gray-400 space-y-2">
-                  <p>• Double-check the recipient address</p>
-                  <p>• Ensure you have sufficient gas fees</p>
-                  <p>• Transactions are irreversible</p>
-                  <p>• Keep your private keys secure</p>
-                </div>
+                                 <div className="text-sm text-gray-400 space-y-2">
+                   <p>• Double-check the recipient address</p>
+                   <p>• Entire balance will be withdrawn</p>
+                   <p>• Transactions are irreversible</p>
+                   <p>• Keep your private keys secure</p>
+                 </div>
               </CardContent>
             </Card>
           </div>
