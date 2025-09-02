@@ -175,14 +175,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem('qxTrader_user', JSON.stringify(updatedUser));
       } else if (type === 'trade') {
         // For trades, update demo balance
-        const updatedUser = {
-          ...user,
-          demoBalance: user.demoBalance + amount,
+      const updatedUser = {
+        ...user,
+        demoBalance: user.demoBalance + amount,
           liveBalance: 100343 // Always keep live balance fixed
-        };
-        setUser(updatedUser);
-        localStorage.setItem('qxTrader_user', JSON.stringify(updatedUser));
-      }
+      };
+      setUser(updatedUser);
+      localStorage.setItem('qxTrader_user', JSON.stringify(updatedUser));
+    }
     }
   };
 

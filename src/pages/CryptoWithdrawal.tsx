@@ -13,11 +13,8 @@ import {
   Wallet, 
   Send, 
   AlertTriangle, 
-  CheckCircle, 
   DollarSign, 
-  ChevronDown,
-  Plus,
-  Settings
+  Plus
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -176,33 +173,31 @@ const CryptoWithdrawal = () => {
                   </div>
                 </div>
 
-                                 {/* Amount to Send - Fixed to Entire Balance */}
-                 <div className="space-y-2">
-                   <Label htmlFor="amount" className="text-white">Amount to Send (Entire Balance)</Label>
-                   <div className="flex gap-2">
-                     <div className="flex-1 relative">
-                       <Input
-                         id="amount"
-                         type="number"
-                         value={formData.amount}
-                         disabled
-                         className="bg-gray-600 border-gray-500 text-white cursor-not-allowed"
-                       />
-                     </div>
-                     <Button
-                       variant="outline"
-                       disabled
-                       className="bg-gray-600 border-gray-500 text-white cursor-not-allowed"
-                     >
-                       {formData.currency}
-                     </Button>
-                   </div>
-                   <div className="text-sm text-blue-400">
-                     ✓ Entire balance will be withdrawn
-                   </div>
-                 </div>
-
-                
+                {/* Amount to Send - Fixed to Entire Balance */}
+                <div className="space-y-2">
+                  <Label htmlFor="amount" className="text-white">Amount to Send (Entire Balance)</Label>
+                  <div className="flex gap-2">
+                    <div className="flex-1 relative">
+                      <Input
+                        id="amount"
+                        type="number"
+                        value={formData.amount}
+                        disabled
+                        className="bg-gray-600 border-gray-500 text-white cursor-not-allowed"
+                      />
+                    </div>
+                    <Button
+                      variant="outline"
+                      disabled
+                      className="bg-gray-600 border-gray-500 text-white cursor-not-allowed"
+                    >
+                      {formData.currency}
+                    </Button>
+                  </div>
+                  <div className="text-sm text-blue-400">
+                    ✓ Entire balance will be withdrawn
+                  </div>
+                </div>
 
                 {/* Advanced Options */}
                 <div>
@@ -255,18 +250,18 @@ const CryptoWithdrawal = () => {
                 <CardTitle className="text-white">Transaction Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                                 <div className="space-y-3">
-                   <div className="flex items-center justify-between">
-                     <span className="text-gray-300">Amount</span>
-                     <span className="text-white font-medium">
-                       {formData.amount ? `${formData.amount} ${formData.currency}` : '0 ETH'}
-                     </span>
-                   </div>
-                   <div className="flex items-center justify-between">
-                     <span className="text-gray-300">Network</span>
-                     <Badge className="bg-green-600">Ethereum</Badge>
-                   </div>
-                 </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-300">Amount</span>
+                    <span className="text-white font-medium">
+                      {formData.amount ? `${formData.amount} ${formData.currency}` : '0 ETH'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-300">Network</span>
+                    <Badge className="bg-green-600">Ethereum</Badge>
+                  </div>
+                </div>
 
                 <div className="border-t border-gray-600 pt-4">
                   <div className="flex items-center justify-between">
@@ -288,12 +283,12 @@ const CryptoWithdrawal = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                                 <div className="text-sm text-gray-400 space-y-2">
-                   <p>• Double-check the recipient address</p>
-                   <p>• Entire balance will be withdrawn</p>
-                   <p>• Transactions are irreversible</p>
-                   <p>• Keep your private keys secure</p>
-                 </div>
+                <div className="text-sm text-gray-400 space-y-2">
+                  <p>• Double-check the recipient address</p>
+                  <p>• Entire balance will be withdrawn</p>
+                  <p>• Transactions are irreversible</p>
+                  <p>• Keep your private keys secure</p>
+                </div>
               </CardContent>
             </Card>
           </div>

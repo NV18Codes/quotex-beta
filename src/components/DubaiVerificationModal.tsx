@@ -31,7 +31,7 @@ const DubaiVerificationModal = ({ isOpen, onClose }: DubaiVerificationModalProps
               <div>
                 <h4 className="text-2xl font-bold text-green-800 mb-3">Account Verification Completed</h4>
                 <div className="text-lg text-green-700">
-                  <p>Expect a call within the next 7 business days from our verification team.</p>
+                  <p>Your account is now fully verified and ready for trading and withdrawals.</p>
                 </div>
               </div>
             </div>

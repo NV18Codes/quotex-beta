@@ -265,7 +265,7 @@ const UserSettings = () => {
                              <div>
                                <h4 className="font-medium text-green-300 mb-2">Account Verification Completed</h4>
                                <div className="text-sm text-green-400">
-                                 <p>Expect a call within the next 7 business days from our verification team.</p>
+                                 <p>Your account is now fully verified and ready for trading and withdrawals.</p>
                                </div>
                              </div>
                            </div>

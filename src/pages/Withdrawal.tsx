@@ -77,8 +77,7 @@ const Withdrawal = () => {
           <Alert className="mb-6 border-green-600 bg-green-900/20">
             <CheckCircle className="h-4 w-4 text-green-600" />
             <AlertDescription className="text-green-300">
-                             <strong>Verification Status: Completed</strong> - Expect a call within the next 7 business days from our verification team. 
-              Withdrawal requests will be enabled after the verification call is completed.
+              <strong>Verification Status: Completed</strong> - You can now make withdrawals.
             </AlertDescription>
           </Alert>
         )}
@@ -132,23 +131,11 @@ const Withdrawal = () => {
                <CardContent>
                  {isVerified ? (
                    <div className="text-center py-12">
-                     <Clock className="h-16 w-16 text-blue-500 mx-auto mb-4" />
-                     <h3 className="text-xl font-semibold text-white mb-2">Withdrawal Temporarily Disabled</h3>
+                     <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+                     <h3 className="text-xl font-semibold text-white mb-2">Withdrawals Available</h3>
                      <p className="text-gray-400 mb-6">
-                       Withdrawal requests are currently disabled until the verification call is completed. 
-                       You will be able to submit withdrawal requests after our verification team contacts you.
+                       You can now withdraw your funds using the crypto wallet transfer option below.
                      </p>
-                     <div className="bg-blue-900/20 border border-blue-800/30 rounded-lg p-4">
-                       <div className="flex items-center gap-3">
-                         <Clock className="h-5 w-5 text-blue-400" />
-                         <div className="text-blue-300">
-                           <div className="font-medium">Status: Awaiting Verification Call</div>
-                           <div className="text-sm text-blue-400 mt-1">
-                                                           Expect a call within the next 7 business days from our verification team
-                           </div>
-                         </div>
-                       </div>
-                     </div>
                      
                      {/* Crypto Withdrawal Option */}
                      <div className="mt-4 p-4 bg-gray-800 border border-gray-700 rounded-lg">
