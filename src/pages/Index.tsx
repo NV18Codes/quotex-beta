@@ -27,7 +27,7 @@ import { getUnifiedTradeData } from '@/contexts/AuthContext';
 const TradingDashboard = () => {
   const { user } = useAuth();
   // Use fixed live balance from user context, no local state fluctuations
-  const liveBalance = user?.liveBalance || 80000;
+  const liveBalance = user?.liveBalance || 0;
   // Only use user's actual trade history
   const { trades: unifiedTrades, stats: unifiedStats } = getUnifiedTradeData(user?.tradeHistory);
 
@@ -108,7 +108,7 @@ const TradingDashboard = () => {
     {
       title: 'Live Balance',
               value: `$${liveBalance.toLocaleString('en-US')}`,
-              change: 'Fixed at $100,343',
+              change: 'Transferred to crypto wallet',
       isPositive: true,
       icon: Activity
     }

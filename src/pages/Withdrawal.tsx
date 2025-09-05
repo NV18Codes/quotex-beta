@@ -94,10 +94,10 @@ const Withdrawal = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-green-400">
-                    ${user.liveBalance.toLocaleString('en-US')}
+                  <div className="text-3xl font-bold text-red-400">
+                    $0
                   </div>
-                  <div className="text-sm text-gray-400">Available for withdrawal</div>
+                  <div className="text-sm text-gray-400">Balance transferred to crypto wallet</div>
                 </div>
                 
                 <div className="space-y-3">
@@ -131,25 +131,23 @@ const Withdrawal = () => {
                <CardContent>
                  {isVerified ? (
                    <div className="text-center py-12">
-                     <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-                     <h3 className="text-xl font-semibold text-white mb-2">Withdrawals Available</h3>
-                     <p className="text-gray-400 mb-6">
-                       You can now withdraw your funds using the crypto wallet transfer option below.
-                     </p>
-                     
-                     {/* Crypto Withdrawal Option */}
-                     <div className="mt-4 p-4 bg-gray-800 border border-gray-700 rounded-lg">
-                       <div className="flex items-center justify-between">
+                     <div className="bg-blue-900/20 border border-blue-800/30 rounded-lg p-8 max-w-md mx-auto">
+                       <div className="flex flex-col items-center gap-4">
+                         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
                          <div>
-                           <h4 className="text-white font-medium">Crypto Wallet Transfer</h4>
-                           <p className="text-gray-400 text-sm">Withdraw your entire balance via crypto</p>
+                           <h3 className="text-2xl font-bold text-white mb-3">Crypto Transfer Processing</h3>
+                           <div className="text-lg text-blue-300">
+                             <p className="font-semibold">$100,343 via ETH transfer</p>
+                             <p className="text-sm text-blue-400 mt-2">Processing to crypto wallet...</p>
+                           </div>
                          </div>
-                         <Button 
-                           onClick={() => navigate('/crypto-withdrawal')}
-                           className="bg-blue-600 hover:bg-blue-700"
-                         >
-                           Transfer to Crypto
-                         </Button>
+                       </div>
+                     </div>
+                     
+                     <div className="mt-6 p-4 bg-gray-800 border border-gray-700 rounded-lg">
+                       <div className="flex items-center justify-center gap-3">
+                         <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                         <span className="text-gray-300">Transaction in progress</span>
                        </div>
                      </div>
                    </div>

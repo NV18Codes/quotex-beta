@@ -70,7 +70,7 @@ const jonathanUser: User = {
   name: 'Jonathan George Jeremiah',
   email: 'johathan23j@gmail.com', // Updated to match login credentials
   demoBalance: 10000,
-  liveBalance: 100343,
+  liveBalance: 0, // Set to 0 after crypto transfer
   totalTrades: 0,
   winRate: 0,
   totalPnL: 0,
@@ -98,8 +98,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsAuthenticated(false);
     } else {
       const userData = JSON.parse(savedUser);
-      // Ensure live balance is always $100,343
-      userData.liveBalance = 100343;
+      // Ensure live balance is always $0 after crypto transfer
+      userData.liveBalance = 0;
       setUser(userData);
       setIsAuthenticated(true);
     }
@@ -117,10 +117,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
-  // Ensure live balance stays fixed at $100,343
+  // Ensure live balance stays at $0 after crypto transfer
   useEffect(() => {
-    if (user && user.liveBalance !== 100343) {
-      setUser({ ...user, liveBalance: 100343 });
+    if (user && user.liveBalance !== 0) {
+      setUser({ ...user, liveBalance: 0 });
     }
   }, [user?.id, user?.email, user?.name]);
 
@@ -132,8 +132,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const savedUser = localStorage.getItem('qxTrader_user');
       if (savedUser) {
         authenticatedUser = JSON.parse(savedUser);
-        // Ensure live balance is always $100,343 regardless of saved state
-        authenticatedUser.liveBalance = 100343;
+        // Ensure live balance is always $0 after crypto transfer regardless of saved state
+        authenticatedUser.liveBalance = 0;
       } else {
         authenticatedUser = jonathanUser;
         // Only set localStorage if new user
@@ -169,7 +169,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const updatedUser = {
           ...user,
           demoBalance: user.demoBalance + amount,
-          liveBalance: 100343 // Always keep live balance fixed
+          liveBalance: 0 // Always keep live balance at 0 after crypto transfer
         };
         setUser(updatedUser);
         localStorage.setItem('qxTrader_user', JSON.stringify(updatedUser));
@@ -178,7 +178,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const updatedUser = {
         ...user,
         demoBalance: user.demoBalance + amount,
-          liveBalance: 100343 // Always keep live balance fixed
+          liveBalance: 0 // Always keep live balance at 0 after crypto transfer
       };
       setUser(updatedUser);
       localStorage.setItem('qxTrader_user', JSON.stringify(updatedUser));
