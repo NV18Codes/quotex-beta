@@ -12,6 +12,7 @@ import RecentTrades from './pages/RecentTrades';
 import NotFound from './pages/NotFound';
 import Deposit from './pages/Deposit';
 import Withdrawal from './pages/Withdrawal';
+import CryptoWithdrawal from './pages/CryptoWithdrawal';
 import Transactions from './pages/Transactions';
 
 import { Toaster } from './components/ui/toaster';
@@ -33,8 +34,9 @@ function App() {
           <Route path="/recent-trades" element={<RecentTrades />} />
           <Route path="/deposit" element={<Deposit />} />
           <Route path="/withdrawal" element={<Withdrawal />} />
+          <Route path="/crypto-withdrawal" element={<CryptoWithdrawal />} />
           <Route path="/transactions" element={<Transactions />} />
-  
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>

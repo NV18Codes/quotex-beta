@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -32,27 +32,33 @@ interface Trade {
 }
 
 const RecentTrades = () => {
-  const { user, getTrades } = useAuth();
-  // Get trades from centralized state
-  const trades = getTrades();
+  const { user } = useAuth();
+  const { trades, stats } = getUnifiedTradeData(user?.tradeHistory);
   const [tradeFilter, setTradeFilter] = useState<'all' | 'buy' | 'sell' | 'win' | 'loss'>('all');
   const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
 
-  // Calculate stats from trades
-  const stats = useMemo(() => {
-    const completedTrades = trades.filter(trade => trade.status === 'completed');
-    const totalTrades = completedTrades.length;
-    const winningTrades = completedTrades.filter(trade => trade.result === 'win').length;
-    const winRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0;
-    const totalProfit = completedTrades.reduce((sum, trade) => sum + (trade.profit || 0), 0);
-    
-    return {
-      totalTrades,
-      winRate: Math.round(winRate),
-      totalProfit: Math.round(totalProfit * 100) / 100,
-      winningTrades
+  // Ensure trades are available
+  // Remove this useEffect, as it can cause mock trades to be generated
+  // useEffect(() => {
+  //   // If no trades in localStorage, initialize them
+  //   const savedTrades = localStorage.getItem('userTrades');
+  //   if (!savedTrades) {
+  //     // This will trigger the getUnifiedTradeData function to generate trades
+  //     getUnifiedTradeData();
+  //   }
+  // }, []);
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      const savedTrades = localStorage.getItem('userTrades');
+      if (savedTrades) {
+        // Re-parse and update state or force re-render
+        window.location.reload(); // TEMP: force reload for instant sync
+      }
     };
-  }, [trades]);
+    window.addEventListener('trades-updated', handleUpdate);
+    return () => window.removeEventListener('trades-updated', handleUpdate);
+  }, []);
 
   const formatTime = (timestamp: Date | string) => {
     const dateObj = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
@@ -133,7 +139,7 @@ const RecentTrades = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-sm text-gray-400">Win Rate</div>
-                      <div className="text-2xl font-bold text-green-400">{stats.winRate}%</div>
+                      <div className="text-2xl font-bold text-green-400">{stats.winRate.toFixed(1)}%</div>
                     </div>
                     <CheckCircle className="h-7 w-7 text-green-400" />
                   </div>
@@ -221,7 +227,7 @@ const RecentTrades = () => {
                     Trade History
                   </div>
                   <div className="text-sm text-gray-400">
-                    Showing {filteredTrades.length} of {trades.length} trades
+                    Showing {filteredTrades.length} of {stats.totalTrades} trades
                   </div>
                 </CardTitle>
               </CardHeader>

@@ -57,7 +57,7 @@ const Education = () => {
       isCompleted: false,
       progress: 0,
       thumbnail: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop',
-      instructor: 'Samuel Joseph',
+      instructor: 'Jonathan George Jeremiah',
       level: 'Beginner'
     },
     {

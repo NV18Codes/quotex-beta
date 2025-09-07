@@ -22,10 +22,10 @@ const Deposit = () => {
   const [depositData, setDepositData] = useState({
     amount: '100',
     paymentMethod: 'Bank Transfer',
-            firstName: 'JUSTIN',
-        lastName: 'RAJU AROKIASWAMY',
-        email: 'justin@thealphaandomega.org',
-        phone: '+91 84828 67180'
+    firstName: 'JONATHAN',
+    lastName: 'GEORGE JEREMIAH',
+    email: 'johathan23j@gmail.com',
+            phone: '+971 50 848 0638'
   });
 
   const quickAmounts = [50, 100, 250, 500, 1000, 2500];
@@ -73,7 +73,7 @@ const Deposit = () => {
 
       // Simulate successful deposit
       if (updateBalance) {
-        updateBalance(amount, 'deposit');
+        updateBalance(amount);
       }
 
       toast({
@@ -85,10 +85,10 @@ const Deposit = () => {
       setDepositData({
         amount: '100',
         paymentMethod: 'Bank Transfer',
-        firstName: 'JUSTIN',
-        lastName: 'RAJU AROKIASWAMY',
-        email: 'justin@thealphaandomega.org',
-        phone: '+91 84828 67180'
+        firstName: 'JONATHAN',
+        lastName: 'GEORGE JEREMIAH',
+        email: 'johathan23j@gmail.com',
+        phone: '+971 50 848 0638'
       });
 
     } catch (error) {

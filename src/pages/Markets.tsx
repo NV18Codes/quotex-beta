@@ -51,13 +51,13 @@ interface Trade {
 }
 
 const Markets = () => {
-  const { user, updateBalance, addTrade, updateTrade, getTrades } = useAuth();
+  const { user, updateBalance } = useAuth();
   const [markets, setMarkets] = useState<Market[]>([]);
+  const [activeTrades, setActiveTrades] = useState<Trade[]>([]);
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [tradeAmount, setTradeAmount] = useState(100);
   const [tradeDuration, setTradeDuration] = useState(60);
   const [isTrading, setIsTrading] = useState(false);
-  const [activeTrades, setActiveTrades] = useState<Trade[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [tradeFilter, setTradeFilter] = useState('all');
 
@@ -140,22 +140,39 @@ const Markets = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Load trades from centralized state
+  // Load existing trades from localStorage
   useEffect(() => {
-    const trades = getTrades();
-    setActiveTrades(trades);
-  }, [getTrades]);
+    const savedTrades = localStorage.getItem('userTrades');
+    if (savedTrades) {
+      const parsedTrades = JSON.parse(savedTrades).map((trade: any) => ({
+        ...trade,
+        timestamp: new Date(trade.timestamp)
+      }));
+      setActiveTrades(parsedTrades);
+    } else {
+      setActiveTrades([]); // No fallback to user?.tradeHistory or mock data
+      localStorage.setItem('userTrades', JSON.stringify([]));
+    }
+  }, [user]);
 
-  // Subscribe to trade updates
+  // Save trades to localStorage whenever trades change
   useEffect(() => {
-    const interval = setInterval(() => {
-      const trades = getTrades();
-      setActiveTrades(trades);
-    }, 1000); // Check for updates every second
-    
-    return () => clearInterval(interval);
-  }, [getTrades]);
+    if (activeTrades.length > 0) {
+      localStorage.setItem('userTrades', JSON.stringify(activeTrades));
+    }
+  }, [activeTrades]);
 
+  useEffect(() => {
+    const handleUpdate = () => {
+      const savedTrades = localStorage.getItem('userTrades');
+      if (savedTrades) {
+        // Re-parse and update state or force re-render
+        window.location.reload(); // TEMP: force reload for instant sync
+      }
+    };
+    window.addEventListener('trades-updated', handleUpdate);
+    return () => window.removeEventListener('trades-updated', handleUpdate);
+  }, []);
 
   const handleTrade = (type: 'buy' | 'sell') => {
     if (!selectedMarket || !user) return;
@@ -171,18 +188,24 @@ const Markets = () => {
     };
 
     // Add new trade to the beginning of the existing trade history
-    addTrade(newTrade);
+    setActiveTrades(prev => [newTrade, ...prev]);
     setIsTrading(true);
 
     // Simulate trade result after duration - ALWAYS WIN
     setTimeout(() => {
       const profit = tradeAmount * (0.7 + Math.random() * 0.6); // Always positive profit
       
-      updateTrade(newTrade.id, { status: 'completed', result: 'win', profit });
+      setActiveTrades(prev => 
+        prev.map(trade => 
+          trade.id === newTrade.id 
+            ? { ...trade, status: 'completed', result: 'win', profit }
+            : trade
+        )
+      );
 
       // Update balance
       if (updateBalance) {
-        updateBalance(profit, 'trade');
+        updateBalance(profit);
       }
     }, tradeDuration * 1000);
   };

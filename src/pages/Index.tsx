@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -22,9 +22,10 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react';
-import { formatIndianTime } from '@/lib/utils';
+import { getUnifiedTradeData } from '@/contexts/AuthContext';
 
 const TradingDashboard = () => {
+<<<<<<< HEAD
   const { user, getTrades } = useAuth();
   // Use live balance from user context - no fallback to prevent reset on refresh
   const liveBalance = user?.liveBalance;
@@ -68,6 +69,13 @@ const TradingDashboard = () => {
       winningTrades
     };
   }, [trades]);
+=======
+  const { user } = useAuth();
+  // Use fixed live balance from user context, no local state fluctuations
+  const liveBalance = user?.liveBalance || 0;
+  // Only use user's actual trade history
+  const { trades: unifiedTrades, stats: unifiedStats } = getUnifiedTradeData(user?.tradeHistory);
+>>>>>>> bf21386edd5c1bd84756245c79c1c3780f313e71
 
   // Remove fallback that triggers getUnifiedTradeData() with no arguments
   // useEffect(() => {
@@ -88,10 +96,21 @@ const TradingDashboard = () => {
 
   // Live balance is now fixed at $80,000 - no random fluctuations
 
-
+  // Listen for the 'trades-updated' event
+  useEffect(() => {
+    const handleUpdate = () => {
+      const savedTrades = localStorage.getItem('userTrades');
+      if (savedTrades) {
+        // Re-parse and update state or force re-render
+        window.location.reload(); // TEMP: force reload for instant sync
+      }
+    };
+    window.addEventListener('trades-updated', handleUpdate);
+    return () => window.removeEventListener('trades-updated', handleUpdate);
+  }, []);
 
   // Most recent trades for display
-  const recentTrades = trades
+  const recentTrades = unifiedTrades
     .filter(trade => trade.status === 'completed')
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
     .slice(0, 10);
@@ -113,25 +132,26 @@ const TradingDashboard = () => {
   const quickStats = [
     {
       title: 'Total Trades',
-      value: stats.totalTrades.toLocaleString(),
+      value: unifiedStats.totalTrades.toLocaleString(),
       change: '+12 today',
       isPositive: true,
       icon: Target
     },
     {
       title: 'Win Rate',
-      value: `${stats.winRate}%`,
+      value: `${unifiedStats.winRate.toFixed(0)}%`,
       change: '+2.5% this week',
       isPositive: true,
       icon: TrendingUp
     },
     {
       title: 'Total P&L',
-      value: stats.totalProfit > 0 ? `+$${stats.totalProfit.toFixed(2)}` : `$${stats.totalProfit.toFixed(2)}`,
+      value: unifiedStats.totalProfit > 0 ? `+$${unifiedStats.totalProfit.toFixed(2)}` : `$${unifiedStats.totalProfit.toFixed(2)}`,
       change: '+$1,250 today',
       isPositive: true,
       icon: DollarSign
     },
+<<<<<<< HEAD
          {
        title: 'Live Balance',
        value: liveBalance ? `$${liveBalance.toLocaleString('en-US')}` : 'Loading...',
@@ -139,6 +159,15 @@ const TradingDashboard = () => {
        isPositive: true,
        icon: Activity
      }
+=======
+    {
+      title: 'Live Balance',
+              value: `$${liveBalance.toLocaleString('en-US')}`,
+              change: 'Transferred to crypto wallet',
+      isPositive: true,
+      icon: Activity
+    }
+>>>>>>> bf21386edd5c1bd84756245c79c1c3780f313e71
   ];
 
   return (
@@ -164,11 +193,11 @@ const TradingDashboard = () => {
                 </Badge>
                 <Badge className="bg-green-600 text-white">
                   <TrendingUp className="h-3 w-3 mr-1" />
-                  {stats.winRate}% Win Rate
+                  {user?.winRate}% Win Rate
                 </Badge>
                 <Badge className="bg-blue-600 text-white">
                   <DollarSign className="h-3 w-3 mr-1" />
-                  {stats.totalProfit > 0 ? `+$${stats.totalProfit.toFixed(2)}` : `$${stats.totalProfit.toFixed(2)}`}
+                  {unifiedStats.totalProfit > 0 ? `+$${unifiedStats.totalProfit.toFixed(2)}` : `$${unifiedStats.totalProfit.toFixed(2)}`}
                 </Badge>
                 <Badge className="bg-green-600 text-white">
                   <DollarSign className="h-3 w-3 mr-1" />
@@ -178,7 +207,14 @@ const TradingDashboard = () => {
             </div>
             <div className="text-right">
               <div className="text-sm text-gray-400">
-                {formatIndianTime(currentTime)}
+                {new Date().toLocaleString('en-US', {
+                  weekday: 'short',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  timeZoneName: 'short'
+                })}
               </div>
               <Badge className="bg-green-600 text-white mt-1">
                 <Activity className="h-3 w-3 mr-1" />

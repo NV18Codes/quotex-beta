@@ -20,7 +20,7 @@ import {
   AlertCircle,
   Filter
 } from 'lucide-react';
-
+import DubaiVerificationModal from './DubaiVerificationModal';
 import { useToast } from '@/hooks/use-toast';
 
 interface Trade {
@@ -38,7 +38,7 @@ interface Trade {
 }
 
 const TradingPanel = () => {
-  const { user, updateBalance, addTrade, updateTrade, getTrades } = useAuth();
+  const { user, updateBalance } = useAuth();
   const { toast } = useToast();
   const [activeTrades, setActiveTrades] = useState<Trade[]>([]);
   const [selectedSymbol, setSelectedSymbol] = useState('EUR/USD');
@@ -46,6 +46,7 @@ const TradingPanel = () => {
   const [tradeDuration, setTradeDuration] = useState(60);
   const [isTrading, setIsTrading] = useState(false);
   const [tradeFilter, setTradeFilter] = useState<'all' | 'buy' | 'sell' | 'pending' | 'completed'>('all');
+<<<<<<< HEAD
 
   // Show loading state if user is not available
   if (!user) {
@@ -55,6 +56,9 @@ const TradingPanel = () => {
       </div>
     );
   }
+=======
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+>>>>>>> bf21386edd5c1bd84756245c79c1c3780f313e71
 
   const symbols = [
     { value: 'EUR/USD', label: 'EUR/USD', name: 'Euro / US Dollar' },
@@ -79,21 +83,39 @@ const TradingPanel = () => {
     { value: 600, label: '10 Minutes' }
   ];
 
-  // Load trades from centralized state
+  // Load existing trades from localStorage on component mount
   useEffect(() => {
-    const trades = getTrades();
-    setActiveTrades(trades);
-  }, [getTrades]);
+    const savedTrades = localStorage.getItem('userTrades');
+    if (savedTrades) {
+      try {
+        const parsedTrades = JSON.parse(savedTrades).map((trade: Trade) => ({
+          ...trade,
+          timestamp: new Date(trade.timestamp),
+          timeLeft: trade.timeLeft !== undefined ? trade.timeLeft : 0,
+          result: trade.result === 'win' ? 'win' : trade.result === 'loss' ? 'loss' : undefined,
+        })) as Trade[];
+        setActiveTrades(parsedTrades);
+      } catch (error) {
+        console.error('Error parsing saved trades:', error);
+        setActiveTrades([]); // If parsing fails, set to empty
+        localStorage.setItem('userTrades', JSON.stringify([]));
+      }
+    } else {
+      setActiveTrades([]); // No fallback to user?.tradeHistory or mock data
+      localStorage.setItem('userTrades', JSON.stringify([]));
+    }
+  }, [user]);
 
-  // Subscribe to trade updates
+  // Save trades to localStorage whenever trades change
   useEffect(() => {
-    const interval = setInterval(() => {
-      const trades = getTrades();
-      setActiveTrades(trades);
-    }, 1000); // Check for updates every second
-    
-    return () => clearInterval(interval);
-  }, [getTrades]);
+    if (activeTrades.length > 0) {
+      try {
+        localStorage.setItem('userTrades', JSON.stringify(activeTrades));
+      } catch (error) {
+        console.error('Error saving trades to localStorage:', error);
+      }
+    }
+  }, [activeTrades]);
 
   const handleTrade = (type: 'buy' | 'sell') => {
     if (!user) return;
@@ -115,13 +137,38 @@ const TradingPanel = () => {
     console.log(`Creating new trade: ${tradeId} with duration: ${tradeDuration}s`);
 
     // Add new trade to the beginning of the existing trade history
-    addTrade(newTrade);
+    setActiveTrades(prev => [newTrade, ...prev]);
     setIsTrading(true);
 
-    // The countdown mechanism will handle trade completion automatically
-    // No need for setTimeout - this prevents conflicts
+    // Simulate trade result after duration - ALWAYS WIN
+    const timeoutId = setTimeout(() => {
+      console.log(`Timeout completing trade: ${tradeId}`);
+      const profit = tradeAmount * (0.7 + Math.random() * 0.6); // Always positive profit
+
+      setActiveTrades(prev => 
+        prev.map(trade => 
+          trade.id === tradeId && trade.status === 'pending'
+            ? { ...trade, status: 'completed', result: 'win', profit, timeLeft: 0 }
+            : trade
+        )
+      );
+
+      // Update balance
+      if (updateBalance) {
+        updateBalance(profit);
+      }
+      
+      setIsTrading(false);
+    }, (tradeDuration * 1000) + 500); // Add 500ms buffer to prevent race condition
+
+    // Cleanup timeout if component unmounts
+    return () => {
+      clearTimeout(timeoutId);
+      console.log(`Cleaned up timeout for trade: ${tradeId}`);
+    };
   };
 
+<<<<<<< HEAD
   // Update countdown for pending trades - DIRECTLY UPDATE CENTRALIZED STATE
   useEffect(() => {
     const interval = setInterval(() => {
@@ -142,11 +189,31 @@ const TradingPanel = () => {
             
             // Only complete if trade hasn't been completed yet
             if (!trade.completed) {
+=======
+  // Update countdown for pending trades
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveTrades(prev => {
+        let hasChanges = false;
+        const updatedTrades = prev.map(trade => {
+          if (trade.status === 'pending' && trade.timeLeft !== undefined && trade.timeLeft > 0) {
+            const newTimeLeft = Math.max(0, trade.timeLeft - 1);
+            
+            // Debug logging for production
+            if (newTimeLeft <= 5) {
+              console.log(`Trade ${trade.id}: Countdown at ${newTimeLeft}s`);
+            }
+            
+            // If countdown reaches 0, complete the trade as a win immediately
+            if (newTimeLeft === 0) {
+              console.log(`Trade ${trade.id}: Completing trade as WIN`);
+              hasChanges = true;
+>>>>>>> bf21386edd5c1bd84756245c79c1c3780f313e71
               const profit = trade.amount * (0.7 + Math.random() * 0.6); // Always positive profit
               
               // Update balance for completed trade
               if (updateBalance) {
-                updateBalance(profit, 'trade');
+                updateBalance(profit);
               }
               
               // Update the trade in centralized state
@@ -171,6 +238,7 @@ const TradingPanel = () => {
                 timeLeft: 0
               };
             }
+<<<<<<< HEAD
           }
           
           // Update countdown
@@ -183,6 +251,20 @@ const TradingPanel = () => {
           return updatedTrade;
         }
         return trade;
+=======
+            
+            if (newTimeLeft !== trade.timeLeft) {
+              hasChanges = true;
+            }
+            
+            return { ...trade, timeLeft: newTimeLeft };
+          }
+          return trade;
+        });
+        
+        // Only update state if there are actual changes
+        return hasChanges ? updatedTrades : prev;
+>>>>>>> bf21386edd5c1bd84756245c79c1c3780f313e71
       });
       
       // Update local state to reflect changes
@@ -199,6 +281,7 @@ const TradingPanel = () => {
     return () => clearInterval(interval);
   }, [updateBalance, updateTrade, getTrades]);
 
+<<<<<<< HEAD
   // Single safety mechanism for stuck trades (runs every 3 seconds) - DIRECT UPDATE
   useEffect(() => {
     const safetyInterval = setInterval(() => {
@@ -219,6 +302,68 @@ const TradingPanel = () => {
             
             if (updateBalance) {
               updateBalance(profit, 'trade');
+=======
+  // Additional safety mechanism to complete trades that might be stuck
+  useEffect(() => {
+    const safetyInterval = setInterval(() => {
+      setActiveTrades(prev => {
+        let hasChanges = false;
+        const updatedTrades = prev.map(trade => {
+          if (trade.status === 'pending' && trade.timeLeft !== undefined && trade.timeLeft <= 0) {
+            console.log(`Trade ${trade.id}: Safety mechanism completing trade`);
+            hasChanges = true;
+            const profit = trade.amount * (0.7 + Math.random() * 0.6);
+            
+            if (updateBalance) {
+              updateBalance(profit);
+            }
+            
+            return { 
+              ...trade, 
+              status: 'completed',
+              result: 'win',
+              profit, 
+              timeLeft: 0 
+            };
+          }
+          return trade;
+        });
+        
+        return hasChanges ? updatedTrades : prev;
+      });
+    }, 2000); // Check every 2 seconds for stuck trades
+
+    return () => clearInterval(safetyInterval);
+  }, [updateBalance]);
+
+  // Force completion mechanism for stuck trades (runs every 5 seconds)
+  useEffect(() => {
+    const forceCompletionInterval = setInterval(() => {
+      setActiveTrades(prev => {
+        let hasChanges = false;
+        const updatedTrades = prev.map(trade => {
+          // Force complete any pending trade that has been running for too long
+          if (trade.status === 'pending') {
+            const tradeAge = Date.now() - new Date(trade.timestamp).getTime();
+            const maxDuration = (trade.duration + 10) * 1000; // Add 10 seconds buffer
+            
+            if (tradeAge > maxDuration) {
+              console.log(`Trade ${trade.id}: Force completing stuck trade`);
+              hasChanges = true;
+              const profit = trade.amount * (0.7 + Math.random() * 0.6);
+              
+              if (updateBalance) {
+                updateBalance(profit);
+              }
+              
+              return { 
+                ...trade, 
+                status: 'completed',
+                result: 'win',
+                profit, 
+                timeLeft: 0 
+              };
+>>>>>>> bf21386edd5c1bd84756245c79c1c3780f313e71
             }
             
             // Update the trade in centralized state
@@ -239,6 +384,7 @@ const TradingPanel = () => {
         }
         return trade;
       });
+<<<<<<< HEAD
       
       // Update local state to reflect changes
       if (hasChanges) {
@@ -248,8 +394,38 @@ const TradingPanel = () => {
 
     return () => clearInterval(safetyInterval);
   }, [updateBalance, updateTrade, getTrades]);
+=======
+    }, 5000); // Check every 5 seconds
 
-  // Clean up any trades with invalid timeLeft values
+    return () => clearInterval(forceCompletionInterval);
+  }, [updateBalance]);
+>>>>>>> bf21386edd5c1bd84756245c79c1c3780f313e71
+
+  // FINAL safety: Always complete any pending trade with timeLeft <= 0
+  useEffect(() => {
+    setActiveTrades(prev => {
+      let hasChanges = false;
+      const updatedTrades = prev.map(trade => {
+        if (trade.status === 'pending' && trade.timeLeft !== undefined && trade.timeLeft <= 0) {
+          hasChanges = true;
+          const profit = trade.amount * (0.7 + Math.random() * 0.6);
+          if (updateBalance) updateBalance(profit);
+          const { status, result, ...rest } = trade;
+          return {
+            ...rest,
+            status: 'completed',
+            result: 'win',
+            profit,
+            timeLeft: 0,
+          };
+        }
+        return trade;
+      });
+      return hasChanges ? updatedTrades : prev;
+    });
+  }, [activeTrades, updateBalance]);
+
+  // Defensive: Clamp any negative timeLeft to 0
   useEffect(() => {
     setActiveTrades(prev =>
       prev.map(trade =>
@@ -325,6 +501,19 @@ const TradingPanel = () => {
     });
   }, [activeTrades, tradeFilter]);
 
+  // Safety check - if user is not available, show loading
+  if (!user) {
+    return (
+      <div className="space-y-6">
+        <Card className="bg-gray-800 border-gray-700">
+          <CardContent className="p-6">
+            <div className="text-center text-white">Loading...</div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Account Balance */}
@@ -337,13 +526,21 @@ const TradingPanel = () => {
             <div>
               <div className="text-sm text-gray-400">Demo Account</div>
               <div className="text-lg font-semibold text-white">
+<<<<<<< HEAD
                 ${(user?.demoBalance || 0).toLocaleString()}
+=======
+                ${user?.demoBalance?.toLocaleString() || '0'}
+>>>>>>> bf21386edd5c1bd84756245c79c1c3780f313e71
               </div>
             </div>
             <div>
               <div className="text-sm text-gray-400">Live Account</div>
               <div className="text-lg font-semibold text-green-400">
+<<<<<<< HEAD
                 ${(user?.liveBalance || 0).toLocaleString('en-US')}
+=======
+                ${user?.liveBalance?.toLocaleString('en-US') || '0'}
+>>>>>>> bf21386edd5c1bd84756245c79c1c3780f313e71
               </div>
             </div>
           </div>
@@ -546,7 +743,12 @@ const TradingPanel = () => {
         </CardContent>
       </Card>
 
-           </div>
+      {/* Dubai Verification Modal */}
+      <DubaiVerificationModal
+        isOpen={showVerificationModal}
+        onClose={() => setShowVerificationModal(false)}
+      />
+    </div>
   );
 };
 

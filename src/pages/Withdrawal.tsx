@@ -3,15 +3,22 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-
+import DubaiVerificationModal from '@/components/DubaiVerificationModal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+<<<<<<< HEAD
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, TrendingDown, DollarSign, Clock, Banknote, CreditCard, ArrowRight, QrCode } from 'lucide-react';
+=======
+
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Shield, AlertTriangle, CheckCircle, TrendingDown, DollarSign, Clock } from 'lucide-react';
+>>>>>>> bf21386edd5c1bd84756245c79c1c3780f313e71
 import { useToast } from '@/hooks/use-toast';
 
 const Withdrawal = () => {
@@ -19,6 +26,7 @@ const Withdrawal = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+<<<<<<< HEAD
   const [withdrawalForm, setWithdrawalForm] = useState({
     walletAddress: '',
     amount: '2500',
@@ -26,8 +34,16 @@ const Withdrawal = () => {
     confirmWalletAddress: '',
     securityPin: ''
   });
+=======
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+>>>>>>> bf21386edd5c1bd84756245c79c1c3780f313e71
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+
+  // Check if user is verified - For now, show as completed
+  const isVerified = true; // Set to true to show completion message
+  const verificationStatus = 'completed';
 
   // Redirect to home if not authenticated
   useEffect(() => {
@@ -142,9 +158,34 @@ const Withdrawal = () => {
           <p className="text-gray-400 mt-2">Withdraw funds from your trading account</p>
         </div>
 
+        {/* Verification Warning */}
+        {!isVerified && (
+          <Alert className="mb-6 border-yellow-600 bg-yellow-900/20">
+            <AlertTriangle className="h-4 w-4 text-yellow-600" />
+            <AlertDescription className="text-yellow-300">
+              <strong>Verification Required:</strong> You must complete Dubai region verification before making withdrawals. 
+              <Button 
+                onClick={() => setShowVerificationModal(true)}
+                variant="outline" 
+                size="sm" 
+                className="ml-3 border-yellow-600 text-yellow-300 hover:bg-yellow-900/30"
+              >
+                <Shield className="h-4 w-4 mr-2" />
+                Complete Verification
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
 
-
-
+        {/* Verification Completion Message */}
+        {isVerified && (
+          <Alert className="mb-6 border-green-600 bg-green-900/20">
+            <CheckCircle className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-300">
+              <strong>Verification Status: Completed</strong> - You can now make withdrawals.
+            </AlertDescription>
+          </Alert>
+        )}
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Crypto Account Summary */}
@@ -157,6 +198,16 @@ const Withdrawal = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+<<<<<<< HEAD
+=======
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-red-400">
+                    $0
+                  </div>
+                  <div className="text-sm text-gray-400">Balance transferred to crypto wallet</div>
+                </div>
+                
+>>>>>>> bf21386edd5c1bd84756245c79c1c3780f313e71
                 <div className="space-y-3">
                   <div>
                     <div className="text-sm text-gray-400">Total Balance</div>
@@ -177,6 +228,7 @@ const Withdrawal = () => {
                       ({formatIndianCurrency(user.liveBalance * 83)})
                     </div>
                   </div>
+<<<<<<< HEAD
 
                   <div>
                     <div className="text-sm text-gray-400">Network Fee</div>
@@ -186,12 +238,23 @@ const Withdrawal = () => {
                     <div className="text-sm text-blue-400">
                       ({formatIndianCurrency(0.001 * 83 * 1000)})
                     </div>
+=======
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-300">Verification Status</span>
+                    <Badge 
+                      variant={isVerified ? "default" : "destructive"}
+                      className={isVerified ? "bg-green-600" : "bg-red-600"}
+                    >
+                      {isVerified ? "Completed" : "Not Verified"}
+                    </Badge>
+>>>>>>> bf21386edd5c1bd84756245c79c1c3780f313e71
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
+<<<<<<< HEAD
           {/* Send Cryptocurrency Form */}
           <div className="lg:col-span-2">
             <Card className="bg-gray-800 border-gray-700">
@@ -390,6 +453,60 @@ const Withdrawal = () => {
               </CardContent>
             </Card>
           </div>
+=======
+                     {/* Withdrawal Status */}
+           <div className="lg:col-span-2">
+             <Card className="bg-gray-800 border-gray-700">
+               <CardHeader>
+                 <CardTitle className="flex items-center gap-2 text-white">
+                   <TrendingDown className="h-5 w-5" />
+                   Withdrawal Status
+                 </CardTitle>
+               </CardHeader>
+               <CardContent>
+                 {isVerified ? (
+                   <div className="text-center py-12">
+                     <div className="bg-blue-900/20 border border-blue-800/30 rounded-lg p-8 max-w-md mx-auto">
+                       <div className="flex flex-col items-center gap-4">
+                         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
+                         <div>
+                           <h3 className="text-2xl font-bold text-white mb-3">Crypto Transfer Processing</h3>
+                           <div className="text-lg text-blue-300">
+                             <p className="font-semibold">$100,343 via ETH transfer</p>
+                             <p className="text-sm text-blue-400 mt-2">Processing to crypto wallet...</p>
+                           </div>
+                         </div>
+                       </div>
+                     </div>
+                     
+                     <div className="mt-6 p-4 bg-gray-800 border border-gray-700 rounded-lg">
+                       <div className="flex items-center justify-center gap-3">
+                         <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                         <span className="text-gray-300">Transaction in progress</span>
+                       </div>
+                     </div>
+                   </div>
+                 ) : (
+                   <div className="text-center py-12">
+                     <Shield className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
+                     <h3 className="text-xl font-semibold text-white mb-2">Verification Required</h3>
+                     <p className="text-gray-400 mb-6">
+                       To protect your account and comply with regulations, you must complete 
+                       Dubai region verification before making withdrawals.
+                     </p>
+                     <Button 
+                       onClick={() => setShowVerificationModal(true)}
+                       className="bg-blue-600 hover:bg-blue-700"
+                     >
+                       <Shield className="h-4 w-4 mr-2" />
+                       Complete Verification
+                     </Button>
+                   </div>
+                 )}
+               </CardContent>
+             </Card>
+           </div>
+>>>>>>> bf21386edd5c1bd84756245c79c1c3780f313e71
         </div>
 
         {/* FAQ Section */}
@@ -418,9 +535,22 @@ const Withdrawal = () => {
               <h4 className="font-medium text-white mb-2">Is my wallet address secure?</h4>
               <p className="text-gray-400">Yes, all transactions are processed through our secure blockchain network with enterprise-grade security protocols. Double verification required.</p>
             </div>
+<<<<<<< HEAD
+=======
+            <div className="border-l-4 border-yellow-500 pl-4">
+              <h4 className="font-medium text-white mb-2">Why is verification required?</h4>
+              <p className="text-gray-400">Dubai region verification is required for compliance and security purposes.</p>
+            </div>
+>>>>>>> bf21386edd5c1bd84756245c79c1c3780f313e71
           </CardContent>
         </Card>
       </div>
+
+      {/* Verification Modal */}
+      <DubaiVerificationModal
+        isOpen={showVerificationModal}
+        onClose={() => setShowVerificationModal(false)}
+      />
 
       <Footer />
     </div>
