@@ -67,7 +67,7 @@ const justinUser: User = {
   name: 'Justin Raju Arokiaswamy',
   email: 'justin@thealphaandomega.org',
   demoBalance: 1000,
-  liveBalance: 1200,
+  liveBalance: 2500,
   totalTrades: 0,
   winRate: 0,
   totalPnL: 0,
@@ -108,14 +108,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // IMPORTANT: Preserve accumulated profits - never reset below base unless genuinely corrupted
       // Only reset if the balance is completely invalid (negative or undefined)
       if (userData.liveBalance === undefined || userData.liveBalance === null || userData.liveBalance < 0) {
-        console.log('Invalid balance detected, resetting to base $1200');
-        userData.liveBalance = 1200;
-      } else if (userData.liveBalance >= 1200) {
+        console.log('Invalid balance detected, resetting to base $2500');
+        userData.liveBalance = 2500;
+      } else if (userData.liveBalance >= 2500) {
         // Balance is valid and has accumulated profits - preserve them completely
-        console.log(`Preserving accumulated balance: $${userData.liveBalance} (Base: $1200 + Profits: $${userData.liveBalance - 1200})`);
-      } else if (userData.liveBalance < 1200 && userData.liveBalance > 0) {
+        console.log(`Preserving accumulated balance: $${userData.liveBalance} (Base: $2500 + Profits: $${userData.liveBalance - 2500})`);
+      } else if (userData.liveBalance < 2500 && userData.liveBalance > 0) {
         // Balance is below base but positive - this might be from a loss, preserve it
-        console.log(`Preserving balance below base: $${userData.liveBalance} (Base: $1200, Loss: $${1200 - userData.liveBalance})`);
+        console.log(`Preserving balance below base: $${userData.liveBalance} (Base: $2500, Loss: $${2500 - userData.liveBalance})`);
       }
       // If balance is exactly 0, it might be a new user or reset case
       
@@ -152,9 +152,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log(`Login: Preserving existing balance: $${authenticatedUser.liveBalance}`);
         
         // Double-check balance preservation
-        if (authenticatedUser.liveBalance >= 1200) {
-          const accumulatedProfits = authenticatedUser.liveBalance - 1200;
-          console.log(`Login: Balance preserved - Base: $1200 + Accumulated Profits: $${accumulatedProfits} = Total: $${authenticatedUser.liveBalance}`);
+        if (authenticatedUser.liveBalance >= 2500) {
+          const accumulatedProfits = authenticatedUser.liveBalance - 2500;
+          console.log(`Login: Balance preserved - Base: $2500 + Accumulated Profits: $${accumulatedProfits} = Total: $${authenticatedUser.liveBalance}`);
         } else if (authenticatedUser.liveBalance > 0) {
           console.log(`Login: Balance preserved - Current: $${authenticatedUser.liveBalance} (may be below base due to losses)`);
         }
@@ -188,7 +188,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // DO NOT remove user data from localStorage - just mark as not authenticated
     
     if (user) {
-      console.log(`Logout: Preserving balance: $${user.liveBalance} (Base: $1200 + Profits: $${Math.max(0, user.liveBalance - 1200)})`);
+      console.log(`Logout: Preserving balance: $${user.liveBalance} (Base: $2500 + Profits: $${Math.max(0, user.liveBalance - 2500)})`);
       console.log('Logout: All user data preserved in localStorage for next login');
       
       // Save the current user state before logging out
@@ -218,10 +218,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
       } else if (type === 'trade') {
         // For trades, update the live balance with profits/losses
-        // IMPORTANT: Start from base live balance of 1200 and add accumulated profits
-        // This ensures the base $1200 is never lost, only profits accumulate
-        const currentLiveBalance = user.liveBalance || 1200;
-        const baseLiveBalance = 1200;
+        // IMPORTANT: Start from base live balance of 2500 and add accumulated profits
+        // This ensures the base $2500 is never lost, only profits accumulate
+        const currentLiveBalance = user.liveBalance || 2500;
+        const baseLiveBalance = 2500;
         
         // Calculate how much profit we already have accumulated
         const accumulatedProfits = Math.max(0, currentLiveBalance - baseLiveBalance);
@@ -229,8 +229,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Add new profit/loss to accumulated profits
         const newAccumulatedProfits = accumulatedProfits + amount;
         
-        // New live balance = base $1200 + all accumulated profits
-        // Use Math.max to ensure balance never goes below $1200
+        // New live balance = base $2500 + all accumulated profits
+        // Use Math.max to ensure balance never goes below $2500
         const newLiveBalance = Math.max(baseLiveBalance, baseLiveBalance + newAccumulatedProfits);
         
         console.log(`Balance Update: Current: $${currentLiveBalance}, Base: $${baseLiveBalance}, Accumulated: $${accumulatedProfits}, New Profit: $${amount}, New Total: $${newLiveBalance}`);
