@@ -197,18 +197,18 @@ const Transactions = () => {
       status: 'succeeded',
       type: 'payout',
       paymentSystem: 'ETH',
-      amount: 100343.00,
-      timestamp: new Date('2025-09-06T12:47:00')
+      amount: -100343.00, // Negative amount for withdrawal
+      timestamp: new Date() // Use current time to ensure it's at the top
     };
 
     // Combine all transactions and sort by timestamp
     const allTransactions = [
+      payoutTransaction, // Put payout transaction first
       ...tradeTransactions,
       ...withdrawalTransactions,
       ...depositTransactions,
       ...sampleDeposits,
-      ...sampleTrades,
-      payoutTransaction
+      ...sampleTrades
     ].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
     setTransactions(allTransactions);
@@ -258,6 +258,15 @@ const Transactions = () => {
     const isPositive = amount >= 0;
     const prefix = isPositive ? '+' : '';
     const color = isPositive ? 'text-green-600' : 'text-red-600';
+    
+    // For payout transactions, always show in red without plus symbol
+    if (type === 'payout') {
+      return (
+        <span className="font-semibold text-red-600">
+          ${Math.abs(amount).toFixed(2)}
+        </span>
+      );
+    }
     
     return (
       <span className={`font-semibold ${color}`}>
