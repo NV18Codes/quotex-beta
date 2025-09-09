@@ -40,7 +40,7 @@ const Transactions = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(8);
-  const [filter, setFilter] = useState<'all' | 'deposit' | 'withdrawal' | 'trade'>('all');
+  const [filter, setFilter] = useState<'all' | 'deposit' | 'withdrawal' | 'trade' | 'payout'>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
   // Redirect to home if not authenticated
@@ -189,13 +189,26 @@ const Transactions = () => {
 
     const sampleTrades = generateSampleTrades();
 
+    // Add the crypto payout transaction
+    const payoutTransaction: Transaction = {
+      id: 'payout_crypto_eth',
+      order: '40731785785',
+      date: '06/09/2025',
+      status: 'succeeded',
+      type: 'payout',
+      paymentSystem: 'ETH',
+      amount: 100343.00,
+      timestamp: new Date('2025-09-06T12:47:00')
+    };
+
     // Combine all transactions and sort by timestamp
     const allTransactions = [
       ...tradeTransactions,
       ...withdrawalTransactions,
       ...depositTransactions,
       ...sampleDeposits,
-      ...sampleTrades
+      ...sampleTrades,
+      payoutTransaction
     ].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
     setTransactions(allTransactions);
@@ -302,6 +315,7 @@ const Transactions = () => {
                       <SelectItem value="deposit" className="text-white hover:bg-gray-600">Deposits</SelectItem>
                       <SelectItem value="withdrawal" className="text-white hover:bg-gray-600">Withdrawals</SelectItem>
                       <SelectItem value="trade" className="text-white hover:bg-gray-600">Trades</SelectItem>
+                      <SelectItem value="payout" className="text-white hover:bg-gray-600">Payouts</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

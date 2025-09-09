@@ -131,14 +131,16 @@ const Withdrawal = () => {
                <CardContent>
                  {isVerified ? (
                    <div className="text-center py-12">
-                     <div className="bg-blue-900/20 border border-blue-800/30 rounded-lg p-8 max-w-md mx-auto">
+                     <div className="bg-green-900/20 border border-green-800/30 rounded-lg p-8 max-w-md mx-auto">
                        <div className="flex flex-col items-center gap-4">
-                         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
+                         <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center">
+                           <CheckCircle className="h-8 w-8 text-white" />
+                         </div>
                          <div>
-                           <h3 className="text-2xl font-bold text-white mb-3">Crypto Transfer Processing</h3>
-                           <div className="text-lg text-blue-300">
+                           <h3 className="text-2xl font-bold text-white mb-3">Transaction Completed</h3>
+                           <div className="text-lg text-green-300">
                              <p className="font-semibold">$100,343 via ETH transfer</p>
-                             <p className="text-sm text-blue-400 mt-2">Processing to crypto wallet...</p>
+                             <p className="text-sm text-green-400 mt-2">Successfully transferred to crypto wallet</p>
                            </div>
                          </div>
                        </div>
@@ -146,8 +148,8 @@ const Withdrawal = () => {
                      
                      <div className="mt-6 p-4 bg-gray-800 border border-gray-700 rounded-lg">
                        <div className="flex items-center justify-center gap-3">
-                         <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-                         <span className="text-gray-300">Transaction in progress</span>
+                         <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                         <span className="text-gray-300">Transaction completed successfully</span>
                        </div>
                      </div>
                    </div>
