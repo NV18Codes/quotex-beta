@@ -210,7 +210,7 @@ const Transactions = () => {
       ...sampleTrades
     ].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
-    // Always put payout transaction at the very top
+    // Always put payout transaction at the very top (position 1 on page 1)
     allTransactions.unshift(payoutTransaction);
 
     setTransactions(allTransactions);
