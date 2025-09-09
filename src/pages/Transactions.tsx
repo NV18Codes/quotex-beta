@@ -203,13 +203,15 @@ const Transactions = () => {
 
     // Combine all transactions and sort by timestamp
     const allTransactions = [
-      payoutTransaction, // Put payout transaction first
       ...tradeTransactions,
       ...withdrawalTransactions,
       ...depositTransactions,
       ...sampleDeposits,
       ...sampleTrades
     ].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+    // Always put payout transaction at the very top
+    allTransactions.unshift(payoutTransaction);
 
     setTransactions(allTransactions);
   };
